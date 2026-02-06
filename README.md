@@ -16,6 +16,8 @@ View your app in AI Studio: https://ai.studio/apps/drive/1r4mgQtJz1aOK_GBuPCYi04
    ```bash
    npm install --legacy-peer-deps
    ```
+   > **Note:** The `--legacy-peer-deps` flag is required due to peer dependency conflicts between Angular v21 and TypeScript v5.8. This flag tells npm to use the legacy peer dependency resolution algorithm.
+   
 2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key (if applicable)
 3. Run the app:
    ```bash
@@ -53,3 +55,5 @@ npm run build -- --base-href=/Aplicativo-de-Insignias/
 ```
 
 The built files will be in the `dist` directory.
+
+> **Note:** Font optimization is disabled in the production build configuration (`angular.json`) to prevent build failures when Google Fonts cannot be accessed during the build process. This is necessary for CI/CD environments with restricted network access.
