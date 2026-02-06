@@ -3,7 +3,7 @@ module.exports = {
   content: [
     "./index.html",
     "./index.tsx",
-    "./src/**/*.{html,ts,tsx,js}",
+    "./src/**/*.{html,ts,js}",
   ],
   darkMode: "class",
   theme: {
