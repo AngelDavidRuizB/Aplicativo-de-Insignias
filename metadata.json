@@ -1,0 +1,7 @@
+{
+  "name": "FCE Badges Portal",
+  "description": "A comprehensive digital badge ecosystem for FCE including public validation, admin management, and student dashboards.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
