@@ -4,6 +4,17 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
+const PALETTES = [
+  { id: 'tech', name: 'Tecnología', iconBg: 'bg-indigo-100 dark:bg-indigo-900', iconColor: 'text-indigo-600 dark:text-indigo-300', ring: 'ring-indigo-500' },
+  { id: 'finance', name: 'Finanzas', iconBg: 'bg-emerald-100 dark:bg-emerald-900', iconColor: 'text-emerald-600 dark:text-emerald-300', ring: 'ring-emerald-500' },
+  { id: 'management', name: 'Gestión', iconBg: 'bg-blue-100 dark:bg-blue-900', iconColor: 'text-blue-600 dark:text-blue-300', ring: 'ring-blue-500' },
+  { id: 'creative', name: 'Creativo', iconBg: 'bg-pink-100 dark:bg-pink-900', iconColor: 'text-pink-600 dark:text-pink-300', ring: 'ring-pink-500' },
+  { id: 'expert', name: 'Experto', iconBg: 'bg-amber-100 dark:bg-amber-900', iconColor: 'text-amber-600 dark:text-amber-300', ring: 'ring-amber-500' },
+  { id: 'data', name: 'Datos', iconBg: 'bg-cyan-100 dark:bg-cyan-900', iconColor: 'text-cyan-600 dark:text-cyan-300', ring: 'ring-cyan-500' },
+  { id: 'basic', name: 'Básico', iconBg: 'bg-slate-100 dark:bg-slate-800', iconColor: 'text-slate-600 dark:text-slate-300', ring: 'ring-slate-500' },
+  { id: 'uifce', name: 'Institucional', iconBg: 'bg-purple-100 dark:bg-purple-900', iconColor: 'text-purple-600 dark:text-purple-300', ring: 'ring-purple-500' },
+];
+
 @Component({
   selector: 'app-admin-catalog',
   standalone: true,
@@ -61,7 +72,9 @@ import { FormsModule } from '@angular/forms';
               <span class="material-icons">verified</span>
               <span>Insignias Base</span>
             </button>
-            <button class="flex items-center space-x-2 bg-admin-primary text-white border-2 border-admin-primary px-4 py-2 rounded-lg font-semibold hover:bg-purple-900 transition-colors shadow-md">
+            <button 
+              (click)="openModal()"
+              class="flex items-center space-x-2 bg-admin-primary text-white border-2 border-admin-primary px-4 py-2 rounded-lg font-semibold hover:bg-purple-900 transition-colors shadow-md">
               <span class="material-icons">add</span>
               <span>Crear Nueva Insignia</span>
             </button>
@@ -107,7 +120,7 @@ import { FormsModule } from '@angular/forms';
                 [value]="searchQuery()"
                 (input)="updateSearch($event)"
                 class="w-full pl-4 pr-10 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm focus:ring-2 focus:ring-admin-primary focus:border-transparent dark:text-white placeholder-gray-400 outline-none transition-shadow" 
-                placeholder="Buscar por nombre, código o ID..." 
+                placeholder="Buscar por nombre, curso, unidad o ID..." 
                 type="text"/>
               <button class="absolute right-0 top-0 h-full px-3 text-gray-500 hover:text-admin-primary dark:text-gray-400">
                 <span class="material-icons text-xl">search</span>
@@ -147,7 +160,7 @@ import { FormsModule } from '@angular/forms';
                   <tr class="hover:bg-purple-50/50 dark:hover:bg-gray-750 transition-colors group">
                     <td class="px-6 py-4">
                       <div class="flex items-center space-x-3">
-                        <div class="h-10 w-10 rounded-full flex items-center justify-center" [class]="badge.iconBgClass + ' ' + badge.iconColorClass">
+                        <div class="h-10 w-10 rounded-full flex items-center justify-center transition-colors" [class]="badge.iconBgClass + ' ' + badge.iconColorClass">
                           <span class="material-icons">{{badge.icon}}</span>
                         </div>
                         <div>
@@ -280,6 +293,153 @@ import { FormsModule } from '@angular/forms';
           </div>
         </div>
       </footer>
+
+      <!-- Create Badge Modal -->
+      @if (showCreateModal()) {
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <!-- Backdrop -->
+          <div (click)="closeModal()" class="absolute inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity"></div>
+          
+          <!-- Modal Content -->
+          <div class="relative w-full max-w-lg bg-white dark:bg-gray-800 rounded-xl shadow-2xl flex flex-col max-h-[90vh] animate-fade-in-up border border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+              <h3 class="text-xl font-bold text-gray-800 dark:text-white">Nueva Insignia</h3>
+              <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+                <span class="material-icons">close</span>
+              </button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto custom-scrollbar">
+              <div class="space-y-6">
+                <!-- Preview Section -->
+                <div class="mb-6">
+                  <div class="flex items-center justify-between mb-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Vista Previa</label>
+                    <span class="text-xs text-gray-400">Previsualización en vivo</span>
+                  </div>
+                  
+                  <div class="bg-gray-50 dark:bg-gray-900/30 border border-gray-100 dark:border-gray-700 rounded-xl p-6 flex flex-col gap-6">
+                    
+                    <!-- Centered Large Icon -->
+                    <div class="flex flex-col items-center justify-center">
+                       <div class="relative group">
+                          <div class="w-24 h-24 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 ring-4 ring-white dark:ring-gray-800" 
+                              [class]="selectedPalette().iconBg + ' ' + selectedPalette().iconColor">
+                            <span class="material-icons text-5xl">{{ newBadgeIcon() || 'stars' }}</span>
+                          </div>
+                       </div>
+                       <p class="mt-2 text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">Icono Principal</p>
+                    </div>
+
+                    <!-- List Item Preview -->
+                    <div>
+                      <p class="text-xs text-gray-400 dark:text-gray-500 mb-2 ml-1">Vista en Listado</p>
+                      <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 flex items-center shadow-sm">
+                        <div class="h-10 w-10 rounded-full flex items-center justify-center mr-3 transition-colors shrink-0" 
+                             [class]="selectedPalette().iconBg + ' ' + selectedPalette().iconColor">
+                          <span class="material-icons">{{ newBadgeIcon() || 'stars' }}</span>
+                        </div>
+                        <div class="flex-grow min-w-0">
+                          <div class="font-bold text-sm text-gray-900 dark:text-white truncate">{{ newBadgeName() || 'Nombre de la Insignia' }}</div>
+                          <div class="text-xs text-gray-500">{{ newBadgeLevel() }}</div>
+                        </div>
+                        <div class="shrink-0 ml-2">
+                          <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+                            UIFCE
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Basic Info -->
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre de la Insignia</label>
+                    <input 
+                      [(ngModel)]="newBadgeName"
+                      type="text" 
+                      class="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-admin-primary dark:text-white transition-shadow" 
+                      placeholder="Ej. Curso Avanzado de R"/>
+                  </div>
+                  
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Curso Asociado</label>
+                    <input 
+                      [(ngModel)]="newBadgeCourse"
+                      type="text" 
+                      class="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-admin-primary dark:text-white transition-shadow" 
+                      placeholder="Ej. Programación Estadística I"/>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nivel</label>
+                      <select 
+                        [(ngModel)]="newBadgeLevel"
+                        class="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-admin-primary dark:text-white transition-shadow appearance-none">
+                        <option>Nivel Básico</option>
+                        <option>Nivel Intermedio</option>
+                        <option>Nivel Avanzado</option>
+                        <option>Workshop</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Icono (Material Icons)</label>
+                      <input 
+                        [(ngModel)]="newBadgeIcon"
+                        type="text" 
+                        class="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-admin-primary dark:text-white transition-shadow" 
+                        placeholder="Ej. school"/>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Palette Selector -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Estilo Visual (Paleta de Colores)</label>
+                  <div class="grid grid-cols-4 gap-3">
+                    @for (palette of palettes; track palette.id) {
+                      <button 
+                        (click)="selectPalette(palette)"
+                        class="relative flex flex-col items-center p-2 rounded-lg border-2 transition-all hover:bg-gray-50 dark:hover:bg-gray-700/50 group"
+                        [class]="selectedPalette().id === palette.id ? 'border-admin-primary bg-purple-50 dark:bg-purple-900/20' : 'border-transparent'">
+                        
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center mb-1 shadow-sm"
+                             [class]="palette.iconBg + ' ' + palette.iconColor">
+                          <span class="material-icons text-lg">circle</span>
+                        </div>
+                        <span class="text-[10px] font-medium text-gray-600 dark:text-gray-400 text-center leading-tight">{{ palette.name }}</span>
+                        
+                        @if (selectedPalette().id === palette.id) {
+                          <div class="absolute top-1 right-1 w-4 h-4 bg-admin-primary text-white rounded-full flex items-center justify-center shadow-sm">
+                            <span class="material-icons text-[10px] font-bold">check</span>
+                          </div>
+                        }
+                      </button>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 rounded-b-xl">
+              <button 
+                (click)="closeModal()"
+                class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors">
+                Cancelar
+              </button>
+              <button 
+                (click)="saveBadge()"
+                class="px-4 py-2 text-sm font-medium text-white bg-admin-primary hover:bg-purple-800 rounded-lg shadow-sm transition-colors flex items-center gap-2">
+                <span class="material-icons text-sm">save</span>
+                Guardar Insignia
+              </button>
+            </div>
+          </div>
+        </div>
+      }
     </div>
   `
 })
@@ -288,6 +448,15 @@ export class AdminCatalogComponent {
   selectedUnit = signal('');
   itemsPerPage = signal(5);
   currentPage = signal(1);
+  
+  // Modal State
+  showCreateModal = signal(false);
+  newBadgeName = signal('');
+  newBadgeLevel = signal('Nivel Básico');
+  newBadgeCourse = signal('');
+  newBadgeIcon = signal('stars');
+  palettes = PALETTES;
+  selectedPalette = signal(PALETTES[0]);
 
   // Raw data expanded to demonstrate pagination with filtering
   badges = signal([
@@ -487,7 +656,9 @@ export class AdminCatalogComponent {
     return this.badges().filter(b => {
       const matchesSearch = !query || 
         b.name.toLowerCase().includes(query) || 
-        b.uuid.toLowerCase().includes(query);
+        b.uuid.toLowerCase().includes(query) ||
+        b.course.toLowerCase().includes(query) ||
+        b.unit.toLowerCase().includes(query);
         
       const matchesUnit = !unit || b.unit === unit;
 
@@ -559,5 +730,43 @@ export class AdminCatalogComponent {
     if (this.currentPage() > 1) {
       this.currentPage.update(p => p - 1);
     }
+  }
+  
+  openModal() {
+    this.showCreateModal.set(true);
+  }
+
+  closeModal() {
+    this.showCreateModal.set(false);
+  }
+
+  selectPalette(palette: any) {
+    this.selectedPalette.set(palette);
+  }
+
+  saveBadge() {
+    const newBadge = {
+      id: Date.now(),
+      name: this.newBadgeName() || 'Nueva Insignia',
+      level: this.newBadgeLevel(),
+      uuid: `NEW-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`,
+      course: this.newBadgeCourse() || 'Curso General',
+      unit: this.selectedUnit() || 'UIFCE', 
+      hours: '20h', 
+      status: 'Activo',
+      icon: this.newBadgeIcon(),
+      iconBgClass: this.selectedPalette().iconBg,
+      iconColorClass: this.selectedPalette().iconColor,
+      unitBgClass: 'bg-purple-100 dark:bg-purple-900/40',
+      unitColorClass: 'text-purple-800 dark:text-purple-300'
+    };
+    
+    this.badges.update(badges => [newBadge, ...badges]);
+    this.closeModal();
+    // Reset form
+    this.newBadgeName.set('');
+    this.newBadgeIcon.set('stars');
+    this.newBadgeLevel.set('Nivel Básico');
+    this.newBadgeCourse.set('');
   }
 }
