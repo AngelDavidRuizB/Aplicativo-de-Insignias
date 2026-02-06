@@ -160,8 +160,12 @@ const PALETTES = [
                   <tr class="hover:bg-purple-50/50 dark:hover:bg-gray-750 transition-colors group">
                     <td class="px-6 py-4">
                       <div class="flex items-center space-x-3">
-                        <div class="h-10 w-10 rounded-full flex items-center justify-center transition-colors" [class]="badge.iconBgClass + ' ' + badge.iconColorClass">
-                          <span class="material-icons">{{badge.icon}}</span>
+                        <div class="h-10 w-10 rounded-full flex items-center justify-center transition-colors overflow-hidden relative" [class]="badge.iconBgClass + ' ' + badge.iconColorClass">
+                          @if (badge.image) {
+                            <img [src]="badge.image" alt="Badge Icon" class="w-full h-full object-cover">
+                          } @else {
+                            <span class="material-icons">{{badge.icon}}</span>
+                          }
                         </div>
                         <div>
                           <div class="font-bold text-gray-900 dark:text-white">{{badge.name}}</div>
@@ -192,7 +196,10 @@ const PALETTES = [
                       </span>
                     </td>
                     <td class="px-6 py-4 text-right">
-                      <button class="text-gray-400 hover:text-admin-primary dark:hover:text-purple-400 transition-colors p-1">
+                      <button 
+                        (click)="openModal(badge)"
+                        class="text-gray-400 hover:text-admin-primary dark:hover:text-purple-400 transition-colors p-1"
+                        title="Editar insignia">
                         <span class="material-icons text-base">edit</span>
                       </button>
                       <button class="text-gray-400 hover:text-red-500 transition-colors p-1 ml-1 opacity-0 group-hover:opacity-100">
@@ -294,7 +301,7 @@ const PALETTES = [
         </div>
       </footer>
 
-      <!-- Create Badge Modal -->
+      <!-- Create/Edit Badge Modal -->
       @if (showCreateModal()) {
         <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
           <!-- Backdrop -->
@@ -303,7 +310,35 @@ const PALETTES = [
           <!-- Modal Content -->
           <div class="relative w-full max-w-lg bg-white dark:bg-gray-800 rounded-xl shadow-2xl flex flex-col max-h-[90vh] animate-fade-in-up border border-gray-200 dark:border-gray-700">
             <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700">
-              <h3 class="text-xl font-bold text-gray-800 dark:text-white">Nueva Insignia</h3>
+              <div class="flex items-center gap-4">
+                <h3 class="text-xl font-bold text-gray-800 dark:text-white">
+                  {{ isEditing() ? 'Editar Insignia' : 'Nueva Insignia' }}
+                </h3>
+                @if (isEditing()) {
+                  <div class="flex items-center gap-2 animate-fade-in">
+                    <div class="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5 shadow-inner">
+                        <button 
+                            (click)="loadPreviousBadge()" 
+                            [disabled]="!hasPreviousBadge()"
+                            class="p-1.5 rounded-md hover:bg-white dark:hover:bg-gray-600 disabled:opacity-30 disabled:hover:bg-transparent transition-all text-gray-600 dark:text-gray-300"
+                            title="Anterior (Insignia)">
+                            <span class="material-icons text-lg block">chevron_left</span>
+                        </button>
+                        <div class="w-px h-4 bg-gray-300 dark:bg-gray-600 mx-0.5"></div>
+                        <button 
+                            (click)="loadNextBadge()" 
+                            [disabled]="!hasNextBadge()"
+                            class="p-1.5 rounded-md hover:bg-white dark:hover:bg-gray-600 disabled:opacity-30 disabled:hover:bg-transparent transition-all text-gray-600 dark:text-gray-300"
+                            title="Siguiente (Insignia)">
+                            <span class="material-icons text-lg block">chevron_right</span>
+                        </button>
+                    </div>
+                    <span class="text-xs text-gray-400 font-mono hidden sm:inline-block">
+                        {{ currentBadgeIndex() + 1 }} / {{ filteredBadges().length }}
+                    </span>
+                  </div>
+                }
+              </div>
               <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
                 <span class="material-icons">close</span>
               </button>
@@ -323,21 +358,35 @@ const PALETTES = [
                     <!-- Centered Large Icon -->
                     <div class="flex flex-col items-center justify-center">
                        <div class="relative group">
-                          <div class="w-24 h-24 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 ring-4 ring-white dark:ring-gray-800" 
+                          <div class="w-24 h-24 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 ring-4 ring-white dark:ring-gray-800 overflow-hidden" 
                               [class]="selectedPalette().iconBg + ' ' + selectedPalette().iconColor">
-                            <span class="material-icons text-5xl">{{ newBadgeIcon() || 'stars' }}</span>
+                            
+                            @if (newBadgeImage()) {
+                                <img [src]="newBadgeImage()" class="w-full h-full object-cover" alt="Vista previa" />
+                                <button (click)="newBadgeImage.set(null)" class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white">
+                                    <span class="material-icons">close</span>
+                                </button>
+                            } @else {
+                                <span class="material-icons text-5xl">{{ newBadgeIcon() || 'stars' }}</span>
+                            }
                           </div>
                        </div>
-                       <p class="mt-2 text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">Icono Principal</p>
+                       <p class="mt-2 text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                           {{ newBadgeImage() ? 'Imagen Personalizada' : 'Icono Principal' }}
+                       </p>
                     </div>
 
                     <!-- List Item Preview -->
                     <div>
                       <p class="text-xs text-gray-400 dark:text-gray-500 mb-2 ml-1">Vista en Listado</p>
                       <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 flex items-center shadow-sm">
-                        <div class="h-10 w-10 rounded-full flex items-center justify-center mr-3 transition-colors shrink-0" 
+                        <div class="h-10 w-10 rounded-full flex items-center justify-center mr-3 transition-colors shrink-0 overflow-hidden relative" 
                              [class]="selectedPalette().iconBg + ' ' + selectedPalette().iconColor">
-                          <span class="material-icons">{{ newBadgeIcon() || 'stars' }}</span>
+                             @if (newBadgeImage()) {
+                                <img [src]="newBadgeImage()" class="w-full h-full object-cover" />
+                             } @else {
+                                <span class="material-icons">{{ newBadgeIcon() || 'stars' }}</span>
+                             }
                         </div>
                         <div class="flex-grow min-w-0">
                           <div class="font-bold text-sm text-gray-900 dark:text-white truncate">{{ newBadgeName() || 'Nombre de la Insignia' }}</div>
@@ -386,13 +435,50 @@ const PALETTES = [
                       </select>
                     </div>
                     <div>
-                      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Icono (Material Icons)</label>
+                      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Icono (Si no hay imagen)</label>
                       <input 
                         [(ngModel)]="newBadgeIcon"
                         type="text" 
                         class="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-admin-primary dark:text-white transition-shadow" 
                         placeholder="Ej. school"/>
                     </div>
+                  </div>
+
+                  <!-- Image Upload -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Imagen Promocional / Certificado</label>
+                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors relative group">
+                        
+                        @if (newBadgeImage()) {
+                            <div class="relative w-full text-center">
+                                <img [src]="newBadgeImage()" class="max-h-32 mx-auto rounded shadow-sm" alt="Preview">
+                                <button (click)="newBadgeImage.set(null)" class="mt-2 text-xs text-red-500 hover:text-red-700 font-medium flex items-center justify-center gap-1">
+                                    <span class="material-icons text-sm">delete</span> Eliminar imagen
+                                </button>
+                            </div>
+                        } @else {
+                            <div class="space-y-1 text-center">
+                                <span class="material-icons text-gray-400 text-3xl">add_photo_alternate</span>
+                                <div class="flex text-sm text-gray-600 dark:text-gray-400 justify-center">
+                                    <label for="file-upload" class="relative cursor-pointer rounded-md font-medium text-admin-primary hover:text-purple-500 focus-within:outline-none">
+                                        <span>Subir un archivo</span>
+                                        <input id="file-upload" name="file-upload" type="file" class="sr-only" accept="image/*" (change)="onFileSelected($event)">
+                                    </label>
+                                    <p class="pl-1">o arrastrar y soltar</p>
+                                </div>
+                                <p class="text-xs text-gray-500">PNG, JPG, GIF hasta 5MB</p>
+                            </div>
+                        }
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descripción</label>
+                    <textarea 
+                      [(ngModel)]="newBadgeDescription"
+                      rows="3"
+                      class="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-admin-primary dark:text-white transition-shadow resize-none" 
+                      placeholder="Describe los requisitos y competencias de esta insignia..."></textarea>
                   </div>
                 </div>
 
@@ -434,7 +520,7 @@ const PALETTES = [
                 (click)="saveBadge()"
                 class="px-4 py-2 text-sm font-medium text-white bg-admin-primary hover:bg-purple-800 rounded-lg shadow-sm transition-colors flex items-center gap-2">
                 <span class="material-icons text-sm">save</span>
-                Guardar Insignia
+                <span>{{ isEditing() ? 'Guardar Cambios' : 'Guardar Insignia' }}</span>
               </button>
             </div>
           </div>
@@ -451,15 +537,21 @@ export class AdminCatalogComponent {
   
   // Modal State
   showCreateModal = signal(false);
+  isEditing = signal(false);
+  currentBadgeId = signal<number | null>(null);
+
   newBadgeName = signal('');
   newBadgeLevel = signal('Nivel Básico');
   newBadgeCourse = signal('');
   newBadgeIcon = signal('stars');
+  newBadgeDescription = signal('');
+  newBadgeImage = signal<string | null>(null);
+
   palettes = PALETTES;
   selectedPalette = signal(PALETTES[0]);
 
   // Raw data expanded to demonstrate pagination with filtering
-  badges = signal([
+  badges = signal<any[]>([
     {
       id: 1,
       name: 'Analista de Datos Jr',
@@ -470,6 +562,8 @@ export class AdminCatalogComponent {
       hours: '40h',
       status: 'Activo',
       icon: 'analytics',
+      description: 'Certifica las competencias básicas en análisis de datos, uso de herramientas como Power BI y consultas SQL fundamentales.',
+      image: null,
       iconBgClass: 'bg-indigo-100 dark:bg-indigo-900',
       iconColorClass: 'text-indigo-600 dark:text-indigo-300',
       unitBgClass: 'bg-purple-100 dark:bg-purple-900/40',
@@ -485,6 +579,8 @@ export class AdminCatalogComponent {
       hours: '60h',
       status: 'Activo',
       icon: 'code',
+      description: '',
+      image: null,
       iconBgClass: 'bg-purple-100 dark:bg-purple-900',
       iconColorClass: 'text-purple-600 dark:text-purple-300',
       unitBgClass: 'bg-blue-100 dark:bg-blue-900/40',
@@ -500,6 +596,8 @@ export class AdminCatalogComponent {
       hours: '32h',
       status: 'Inactivo',
       icon: 'pie_chart',
+      description: '',
+      image: null,
       iconBgClass: 'bg-orange-100 dark:bg-orange-900',
       iconColorClass: 'text-orange-600 dark:text-orange-300',
       unitBgClass: 'bg-orange-100 dark:bg-orange-900/40',
@@ -515,6 +613,8 @@ export class AdminCatalogComponent {
       hours: '24h',
       status: 'Activo',
       icon: 'storage',
+      description: '',
+      image: null,
       iconBgClass: 'bg-teal-100 dark:bg-teal-900',
       iconColorClass: 'text-teal-600 dark:text-teal-300',
       unitBgClass: 'bg-purple-100 dark:bg-purple-900/40',
@@ -530,12 +630,13 @@ export class AdminCatalogComponent {
       hours: '12h',
       status: 'Pendiente',
       icon: 'public',
+      description: '',
+      image: null,
       iconBgClass: 'bg-indigo-100 dark:bg-indigo-900',
       iconColorClass: 'text-indigo-600 dark:text-indigo-300',
       unitBgClass: 'bg-teal-100 dark:bg-teal-900/40',
       unitColorClass: 'text-teal-800 dark:text-teal-300'
     },
-    // Duplicate data to demonstrate pagination
     {
       id: 6,
       name: 'Visualización de Datos con Tableau',
@@ -546,6 +647,8 @@ export class AdminCatalogComponent {
       hours: '40h',
       status: 'Activo',
       icon: 'analytics',
+      description: '',
+      image: null,
       iconBgClass: 'bg-indigo-100 dark:bg-indigo-900',
       iconColorClass: 'text-indigo-600 dark:text-indigo-300',
       unitBgClass: 'bg-purple-100 dark:bg-purple-900/40',
@@ -561,6 +664,8 @@ export class AdminCatalogComponent {
       hours: '50h',
       status: 'Activo',
       icon: 'psychology',
+      description: '',
+      image: null,
       iconBgClass: 'bg-purple-100 dark:bg-purple-900',
       iconColorClass: 'text-purple-600 dark:text-purple-300',
       unitBgClass: 'bg-blue-100 dark:bg-blue-900/40',
@@ -576,6 +681,8 @@ export class AdminCatalogComponent {
       hours: '20h',
       status: 'Activo',
       icon: 'group_work',
+      description: '',
+      image: null,
       iconBgClass: 'bg-orange-100 dark:bg-orange-900',
       iconColorClass: 'text-orange-600 dark:text-orange-300',
       unitBgClass: 'bg-orange-100 dark:bg-orange-900/40',
@@ -591,6 +698,8 @@ export class AdminCatalogComponent {
       hours: '16h',
       status: 'Inactivo',
       icon: 'campaign',
+      description: '',
+      image: null,
       iconBgClass: 'bg-indigo-100 dark:bg-indigo-900',
       iconColorClass: 'text-indigo-600 dark:text-indigo-300',
       unitBgClass: 'bg-teal-100 dark:bg-teal-900/40',
@@ -606,6 +715,8 @@ export class AdminCatalogComponent {
       hours: '45h',
       status: 'Pendiente',
       icon: 'functions',
+      description: '',
+      image: null,
       iconBgClass: 'bg-teal-100 dark:bg-teal-900',
       iconColorClass: 'text-teal-600 dark:text-teal-300',
       unitBgClass: 'bg-purple-100 dark:bg-purple-900/40',
@@ -621,6 +732,8 @@ export class AdminCatalogComponent {
       hours: '30h',
       status: 'Activo',
       icon: 'stars',
+      description: '',
+      image: null,
       iconBgClass: 'bg-purple-100 dark:bg-purple-900',
       iconColorClass: 'text-purple-600 dark:text-purple-300',
       unitBgClass: 'bg-blue-100 dark:bg-blue-900/40',
@@ -636,6 +749,8 @@ export class AdminCatalogComponent {
       hours: '12h',
       status: 'Activo',
       icon: 'attach_money',
+      description: '',
+      image: null,
       iconBgClass: 'bg-green-100 dark:bg-green-900',
       iconColorClass: 'text-green-600 dark:text-green-300',
       unitBgClass: 'bg-green-100 dark:bg-green-900/40',
@@ -702,6 +817,15 @@ export class AdminCatalogComponent {
     return this.filteredBadges().slice(startIndex, endIndex);
   });
 
+  currentBadgeIndex = computed(() => {
+    const id = this.currentBadgeId();
+    if (id === null) return -1;
+    return this.filteredBadges().findIndex(b => b.id === id);
+  });
+
+  hasPreviousBadge = computed(() => this.currentBadgeIndex() > 0);
+  hasNextBadge = computed(() => this.currentBadgeIndex() !== -1 && this.currentBadgeIndex() < this.filteredBadges().length - 1);
+
   updateSearch(e: Event) {
     const value = (e.target as HTMLInputElement).value;
     this.searchQuery.set(value);
@@ -732,7 +856,24 @@ export class AdminCatalogComponent {
     }
   }
   
-  openModal() {
+  openModal(badge?: any) {
+    if (badge) {
+      this.isEditing.set(true);
+      this.currentBadgeId.set(badge.id);
+      this.newBadgeName.set(badge.name);
+      this.newBadgeLevel.set(badge.level);
+      this.newBadgeCourse.set(badge.course);
+      this.newBadgeIcon.set(badge.icon);
+      this.newBadgeDescription.set(badge.description || '');
+      this.newBadgeImage.set(badge.image || null);
+      
+      const palette = this.palettes.find(p => p.iconBg === badge.iconBgClass) || this.palettes[0];
+      this.selectedPalette.set(palette);
+    } else {
+      this.isEditing.set(false);
+      this.currentBadgeId.set(null);
+      this.resetForm();
+    }
     this.showCreateModal.set(true);
   }
 
@@ -740,33 +881,87 @@ export class AdminCatalogComponent {
     this.showCreateModal.set(false);
   }
 
-  selectPalette(palette: any) {
-    this.selectedPalette.set(palette);
-  }
-
-  saveBadge() {
-    const newBadge = {
-      id: Date.now(),
-      name: this.newBadgeName() || 'Nueva Insignia',
-      level: this.newBadgeLevel(),
-      uuid: `NEW-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`,
-      course: this.newBadgeCourse() || 'Curso General',
-      unit: this.selectedUnit() || 'UIFCE', 
-      hours: '20h', 
-      status: 'Activo',
-      icon: this.newBadgeIcon(),
-      iconBgClass: this.selectedPalette().iconBg,
-      iconColorClass: this.selectedPalette().iconColor,
-      unitBgClass: 'bg-purple-100 dark:bg-purple-900/40',
-      unitColorClass: 'text-purple-800 dark:text-purple-300'
-    };
-    
-    this.badges.update(badges => [newBadge, ...badges]);
-    this.closeModal();
-    // Reset form
+  resetForm() {
     this.newBadgeName.set('');
     this.newBadgeIcon.set('stars');
     this.newBadgeLevel.set('Nivel Básico');
     this.newBadgeCourse.set('');
+    this.newBadgeDescription.set('');
+    this.newBadgeImage.set(null);
+    this.selectedPalette.set(this.palettes[0]);
+  }
+
+  selectPalette(palette: any) {
+    this.selectedPalette.set(palette);
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        this.newBadgeImage.set(result);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  loadPreviousBadge() {
+    const idx = this.currentBadgeIndex();
+    if (idx > 0) {
+      this.openModal(this.filteredBadges()[idx - 1]);
+    }
+  }
+
+  loadNextBadge() {
+    const idx = this.currentBadgeIndex();
+    if (idx < this.filteredBadges().length - 1) {
+      this.openModal(this.filteredBadges()[idx + 1]);
+    }
+  }
+
+  saveBadge() {
+    if (this.isEditing() && this.currentBadgeId()) {
+      this.badges.update(items => items.map(item => {
+        if (item.id === this.currentBadgeId()) {
+           return {
+             ...item,
+             name: this.newBadgeName(),
+             level: this.newBadgeLevel(),
+             course: this.newBadgeCourse(),
+             icon: this.newBadgeIcon(),
+             description: this.newBadgeDescription(),
+             image: this.newBadgeImage(),
+             iconBgClass: this.selectedPalette().iconBg,
+             iconColorClass: this.selectedPalette().iconColor
+           };
+        }
+        return item;
+      }));
+    } else {
+      const newBadge = {
+        id: Date.now(),
+        name: this.newBadgeName() || 'Nueva Insignia',
+        level: this.newBadgeLevel(),
+        uuid: `NEW-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`,
+        course: this.newBadgeCourse() || 'Curso General',
+        unit: this.selectedUnit() || 'UIFCE', 
+        hours: '20h', 
+        status: 'Activo',
+        icon: this.newBadgeIcon(),
+        description: this.newBadgeDescription(),
+        image: this.newBadgeImage(),
+        iconBgClass: this.selectedPalette().iconBg,
+        iconColorClass: this.selectedPalette().iconColor,
+        unitBgClass: 'bg-purple-100 dark:bg-purple-900/40',
+        unitColorClass: 'text-purple-800 dark:text-purple-300'
+      };
+      
+      this.badges.update(badges => [newBadge, ...badges]);
+    }
+    this.closeModal();
+    this.resetForm();
   }
 }
