@@ -88,34 +88,68 @@ const PALETTES = [
             </button>
           </div>
 
-          <div class="flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
-            <div class="flex flex-wrap gap-2 w-full md:w-auto items-center">
+          <div class="flex flex-col xl:flex-row gap-4 items-center justify-between bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
+            <!-- Filter Group: Status -->
+            <div class="flex flex-wrap gap-2 w-full xl:w-auto items-center">
               <div class="flex flex-wrap gap-2">
-                <button class="px-3 py-1.5 text-xs font-medium rounded-md bg-admin-primary text-white shadow-sm">Todos</button>
-                <button class="px-3 py-1.5 text-xs font-medium rounded-md bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">Activos</button>
-                <button class="px-3 py-1.5 text-xs font-medium rounded-md bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">Inactivos</button>
-                <button class="px-3 py-1.5 text-xs font-medium rounded-md bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">Archivados</button>
+                @for (status of ['Todos', 'Activo', 'Inactivo', 'Pendiente', 'Archivado']; track status) {
+                    <button 
+                        (click)="setStatus(status)"
+                        class="px-3 py-1.5 text-xs font-medium rounded-md border transition-colors"
+                        [class.bg-admin-primary]="selectedStatus() === status"
+                        [class.text-white]="selectedStatus() === status"
+                        [class.border-admin-primary]="selectedStatus() === status"
+                        [class.bg-white]="selectedStatus() !== status"
+                        [class.dark:bg-gray-700]="selectedStatus() !== status"
+                        [class.text-gray-600]="selectedStatus() !== status"
+                        [class.dark:text-gray-300]="selectedStatus() !== status"
+                        [class.border-gray-200]="selectedStatus() !== status"
+                        [class.dark:border-gray-600]="selectedStatus() !== status"
+                        [class.hover:bg-gray-50]="selectedStatus() !== status"
+                        [class.dark:hover:bg-gray-600]="selectedStatus() !== status">
+                        {{ status === 'Activo' ? 'Activos' : status === 'Inactivo' ? 'Inactivos' : status === 'Pendiente' ? 'Pendientes' : status === 'Archivado' ? 'Archivados' : 'Todos' }}
+                    </button>
+                }
               </div>
               
-              <div class="hidden md:block w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+              <div class="hidden sm:block w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
 
-              <div class="relative min-w-[180px]">
-                <select 
-                  [value]="selectedUnit()"
-                  (change)="updateUnit($event)"
-                  class="w-full pl-3 pr-8 py-1.5 text-xs font-medium rounded-md bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-admin-primary outline-none cursor-pointer appearance-none transition-colors">
-                  <option value="">Todas las Unidades</option>
-                  @for (unit of units(); track unit) {
-                    <option [value]="unit">{{ unit }}</option>
-                  }
-                </select>
-                <span class="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 dark:text-gray-400 flex items-center">
-                  <span class="material-icons text-sm">expand_more</span>
-                </span>
-              </div>
+              <!-- Filter Group: Dropdowns -->
+               <div class="flex gap-2 flex-grow sm:flex-grow-0">
+                  <div class="relative min-w-[140px] flex-grow sm:flex-grow-0">
+                    <select 
+                      [value]="selectedUnit()"
+                      (change)="updateUnit($event)"
+                      class="w-full pl-3 pr-8 py-1.5 text-xs font-medium rounded-md bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-admin-primary outline-none cursor-pointer appearance-none transition-colors">
+                      <option value="">Todas las Unidades</option>
+                      @for (unit of units(); track unit) {
+                        <option [value]="unit">{{ unit }}</option>
+                      }
+                    </select>
+                    <span class="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 dark:text-gray-400 flex items-center">
+                      <span class="material-icons text-sm">expand_more</span>
+                    </span>
+                  </div>
+
+                  <div class="relative min-w-[140px] flex-grow sm:flex-grow-0">
+                    <select 
+                      [value]="selectedLevel()"
+                      (change)="updateLevel($event)"
+                      class="w-full pl-3 pr-8 py-1.5 text-xs font-medium rounded-md bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 focus:ring-2 focus:ring-admin-primary outline-none cursor-pointer appearance-none transition-colors">
+                      <option value="">Todos los Niveles</option>
+                      @for (level of levels(); track level) {
+                        <option [value]="level">{{ level }}</option>
+                      }
+                    </select>
+                    <span class="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 dark:text-gray-400 flex items-center">
+                      <span class="material-icons text-sm">expand_more</span>
+                    </span>
+                  </div>
+               </div>
             </div>
 
-            <div class="relative w-full md:w-80">
+            <!-- Search -->
+            <div class="relative w-full xl:w-80">
               <input 
                 [value]="searchQuery()"
                 (input)="updateSearch($event)"
@@ -138,12 +172,47 @@ const PALETTES = [
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="bg-purple-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider font-semibold border-b border-purple-100 dark:border-gray-700">
-                  <th class="px-6 py-4">Insignia</th>
+                  <th class="px-6 py-4 cursor-pointer hover:bg-purple-100 dark:hover:bg-gray-700 transition-colors select-none" (click)="toggleSort('name')">
+                    <div class="flex items-center gap-1">
+                        Insignia
+                        @if (sortColumn() === 'name') {
+                            <span class="material-icons text-sm">{{ sortDirection() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</span>
+                        }
+                    </div>
+                  </th>
                   <th class="px-6 py-4">UUID / ID Referencia</th>
-                  <th class="px-6 py-4">Curso Asociado</th>
-                  <th class="px-6 py-4">Unidad Emisora</th>
-                  <th class="px-6 py-4 text-center">Horas</th>
-                  <th class="px-6 py-4 text-center">Estado</th>
+                  <th class="px-6 py-4 cursor-pointer hover:bg-purple-100 dark:hover:bg-gray-700 transition-colors select-none" (click)="toggleSort('course')">
+                    <div class="flex items-center gap-1">
+                        Curso Asociado
+                        @if (sortColumn() === 'course') {
+                            <span class="material-icons text-sm">{{ sortDirection() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</span>
+                        }
+                    </div>
+                  </th>
+                  <th class="px-6 py-4 cursor-pointer hover:bg-purple-100 dark:hover:bg-gray-700 transition-colors select-none" (click)="toggleSort('unit')">
+                     <div class="flex items-center gap-1">
+                        Unidad Emisora
+                        @if (sortColumn() === 'unit') {
+                            <span class="material-icons text-sm">{{ sortDirection() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</span>
+                        }
+                    </div>
+                  </th>
+                  <th class="px-6 py-4 text-center cursor-pointer hover:bg-purple-100 dark:hover:bg-gray-700 transition-colors select-none" (click)="toggleSort('hours')">
+                    <div class="flex items-center justify-center gap-1">
+                        Horas
+                        @if (sortColumn() === 'hours') {
+                            <span class="material-icons text-sm">{{ sortDirection() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</span>
+                        }
+                    </div>
+                  </th>
+                  <th class="px-6 py-4 text-center cursor-pointer hover:bg-purple-100 dark:hover:bg-gray-700 transition-colors select-none" (click)="toggleSort('status')">
+                     <div class="flex items-center justify-center gap-1">
+                        Estado
+                        @if (sortColumn() === 'status') {
+                            <span class="material-icons text-sm">{{ sortDirection() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</span>
+                        }
+                    </div>
+                  </th>
                   <th class="px-6 py-4 text-right">Acciones</th>
                 </tr>
               </thead>
@@ -532,6 +601,13 @@ const PALETTES = [
 export class AdminCatalogComponent {
   searchQuery = signal('');
   selectedUnit = signal('');
+  selectedStatus = signal('Todos');
+  selectedLevel = signal('');
+  
+  // Sorting
+  sortColumn = signal<string>('name');
+  sortDirection = signal<'asc' | 'desc'>('asc');
+
   itemsPerPage = signal(5);
   currentPage = signal(1);
   
@@ -764,11 +840,20 @@ export class AdminCatalogComponent {
     return Array.from(uniqueUnits).sort();
   });
 
+  // Extract unique levels for the dropdown
+  levels = computed(() => {
+    const uniqueLevels = new Set(this.badges().map(b => b.level));
+    return Array.from(uniqueLevels).sort();
+  });
+
   filteredBadges = computed(() => {
     const query = this.searchQuery().toLowerCase().trim();
     const unit = this.selectedUnit();
+    const status = this.selectedStatus();
+    const level = this.selectedLevel();
     
-    return this.badges().filter(b => {
+    // 1. Filtering
+    let result = this.badges().filter(b => {
       const matchesSearch = !query || 
         b.name.toLowerCase().includes(query) || 
         b.uuid.toLowerCase().includes(query) ||
@@ -776,9 +861,36 @@ export class AdminCatalogComponent {
         b.unit.toLowerCase().includes(query);
         
       const matchesUnit = !unit || b.unit === unit;
+      const matchesLevel = !level || b.level === level;
+      const matchesStatus = status === 'Todos' || b.status === status;
 
-      return matchesSearch && matchesUnit;
+      return matchesSearch && matchesUnit && matchesStatus && matchesLevel;
     });
+
+    // 2. Sorting
+    const col = this.sortColumn();
+    const dir = this.sortDirection();
+    const multiplier = dir === 'asc' ? 1 : -1;
+
+    result = [...result].sort((a, b) => {
+        let valA = a[col];
+        let valB = b[col];
+
+        // Handle numeric parsing for hours (e.g., "40h")
+        if (col === 'hours') {
+            valA = parseInt(valA) || 0;
+            valB = parseInt(valB) || 0;
+        } else if (typeof valA === 'string') {
+            valA = valA.toLowerCase();
+            valB = valB.toLowerCase();
+        }
+
+        if (valA < valB) return -1 * multiplier;
+        if (valA > valB) return 1 * multiplier;
+        return 0;
+    });
+
+    return result;
   });
 
   totalItems = computed(() => this.filteredBadges().length);
@@ -826,6 +938,15 @@ export class AdminCatalogComponent {
   hasPreviousBadge = computed(() => this.currentBadgeIndex() > 0);
   hasNextBadge = computed(() => this.currentBadgeIndex() !== -1 && this.currentBadgeIndex() < this.filteredBadges().length - 1);
 
+  toggleSort(column: string) {
+    if (this.sortColumn() === column) {
+        this.sortDirection.update(d => d === 'asc' ? 'desc' : 'asc');
+    } else {
+        this.sortColumn.set(column);
+        this.sortDirection.set('asc');
+    }
+  }
+
   updateSearch(e: Event) {
     const value = (e.target as HTMLInputElement).value;
     this.searchQuery.set(value);
@@ -836,6 +957,17 @@ export class AdminCatalogComponent {
     const value = (e.target as HTMLSelectElement).value;
     this.selectedUnit.set(value);
     this.currentPage.set(1); // Reset to page 1 on filter change
+  }
+  
+  setStatus(status: string) {
+      this.selectedStatus.set(status);
+      this.currentPage.set(1);
+  }
+
+  updateLevel(e: Event) {
+      const value = (e.target as HTMLSelectElement).value;
+      this.selectedLevel.set(value);
+      this.currentPage.set(1);
   }
 
   goToPage(page: number | string | unknown) {
