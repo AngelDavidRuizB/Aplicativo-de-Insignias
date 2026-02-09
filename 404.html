@@ -6,18 +6,22 @@
     <title>UIFCE Badges Platform</title>
     <script>
         // GitHub Pages SPA redirect for hash routing
-        // This redirects any 404 to the root with the path in the hash
+        // This redirects any 404 to the root with the path preserved in the hash
         (function(){
             var path = window.location.pathname;
             var redirectPath = '/Aplicativo-de-Insignias/';
             
-            // If we're not already at the root, redirect there
-            if (path !== redirectPath && path !== redirectPath.replace(/\/$/, '')) {
-                // Extract the path after the repo name and add it as a hash
-                var hashPath = path.replace(redirectPath.replace(/\/$/, ''), '');
-                window.location.replace(redirectPath + '#' + hashPath);
+            // Only redirect if we're in the repository path
+            if (path.startsWith(redirectPath) || path.startsWith('/Aplicativo-de-Insignias')) {
+                // Extract the path after the repo name and add it as a hash if needed
+                var remainder = path.replace(/^\/Aplicativo-de-Insignias\/?/, '');
+                if (remainder && remainder !== '') {
+                    window.location.replace(redirectPath + '#/' + remainder);
+                } else {
+                    window.location.replace(redirectPath);
+                }
             } else {
-                // Just go to the root
+                // Default: just go to the root
                 window.location.replace(redirectPath);
             }
         })();
