@@ -1,0 +1,250 @@
+<div class="min-h-screen bg-gray-50 font-sans">
+  <!-- Header -->
+  <header class="bg-[#4a148c] text-white shadow-lg sticky top-0 z-40">
+    <div class="container mx-auto px-6 py-3">
+      <div class="flex items-center justify-between">
+        <!-- Logo Left -->
+        <div class="flex flex-col">
+          <h1 class="text-2xl font-bold tracking-wider">FCE</h1>
+          <span class="text-[10px] tracking-widest opacity-80 uppercase">Facultad de Ciencias Económicas</span>
+        </div>
+
+        <!-- Right Side -->
+        <div class="flex items-center gap-6">
+          <span class="text-xl font-bold tracking-widest opacity-90">UIFCE</span>
+          
+          <div class="flex items-center gap-3 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+            <span class="material-icons">person</span>
+            <div class="flex flex-col text-right">
+              <span class="text-sm font-medium leading-none">{{ currentUser()?.name || 'Ángel David' }}</span>
+              <span class="text-[10px] text-purple-200 uppercase bg-purple-600/50 px-2 py-0.5 rounded-full mt-1 w-max self-end">Estudiante</span>
+            </div>
+          </div>
+          
+          <button (click)="logout()" class="text-white/80 hover:text-white transition-colors">
+            <span class="material-icons">logout</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-6 py-8">
+    <!-- Page Title -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">Panel del Estudiante</h1>
+      <p class="text-gray-500">Gestiona tu progreso académico y certificaciones.</p>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+      
+      <!-- Left Column: Progress -->
+      <div class="w-full lg:w-1/4 space-y-6">
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+          <div class="flex items-center gap-2 mb-6">
+            <span class="material-icons text-purple-800">emoji_events</span>
+            <h2 class="font-bold text-gray-800">Progreso de Convalidación</h2>
+          </div>
+
+          <!-- Circular Chart -->
+          <div class="relative w-48 h-48 mx-auto mb-6">
+            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="42" fill="none" stroke="#f3f4f6" stroke-width="8"/>
+              <circle cx="50" cy="50" r="42" fill="none" 
+                      stroke="#7e22ce" stroke-width="8" stroke-linecap="round"
+                      [attr.stroke-dasharray]="264"
+                      [attr.stroke-dashoffset]="264 - (264 * progressPercentage() / 100)"/>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <span class="text-4xl font-bold text-gray-800">{{ completedBadgesCount() }}/{{ allBadgesWithStatus().length }}</span>
+              <span class="text-xs text-gray-500 uppercase tracking-wide">Insignias</span>
+            </div>
+          </div>
+
+          <!-- Info Box -->
+          <div class="bg-purple-50 rounded-lg p-4 mb-6 flex gap-3">
+            <span class="material-icons text-purple-600 text-sm mt-0.5">info</span>
+            <p class="text-sm text-purple-900 leading-snug">
+              <span class="font-bold">¡Te falta 1 insignia</span> para convalidar <span class="font-bold">2 créditos</span> de libre elección!
+            </p>
+          </div>
+
+          <!-- Action Button -->
+          <button class="w-full bg-[#5e1b85] hover:bg-purple-900 text-white font-medium py-3 rounded-lg transition-colors shadow-md shadow-purple-200">
+            Ver Cursos Disponibles
+          </button>
+        </div>
+        
+        <div class="mt-4">
+            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Próximos Pasos</h3>
+            <!-- Placeholder for next steps if needed, kept simple for now as per mockup visual weight -->
+        </div>
+      </div>
+
+      <!-- Right Column: Gallery -->
+      <div class="w-full lg:w-3/4">
+        <div class="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
+          <h2 class="text-xl font-bold text-gray-800">Galería de Logros</h2>
+          <div class="flex gap-2 text-gray-400">
+            <button class="p-1 hover:text-purple-700 transition-colors" [class.text-purple-700]="viewMode() === 'list'" (click)="viewMode.set('list')">
+              <span class="material-icons">format_list_bulleted</span>
+            </button>
+            <button class="p-1 hover:text-purple-700 transition-colors" [class.text-purple-700]="viewMode() === 'grid'" (click)="viewMode.set('grid')">
+              <span class="material-icons">grid_view</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="flex flex-wrap gap-2 mb-8 items-center">
+          <span class="text-xs font-bold text-gray-400 uppercase mr-2">Filtrar por unidad:</span>
+          @for (filter of filters; track filter) {
+            <button (click)="selectedFilter.set(filter)"
+                    [class]="selectedFilter() === filter 
+                      ? 'bg-[#5e1b85] text-white shadow-md' 
+                      : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'"
+                    class="px-4 py-1.5 rounded-full text-sm transition-all duration-200">
+              {{ filter }}
+            </button>
+          }
+        </div>
+
+        <!-- Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          @for (item of filteredBadges(); track item.badge.id) {
+            <!-- Card -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow flex flex-col h-full relative group">
+              
+              <!-- Status Color Bar -->
+              <div class="h-1.5 w-full"
+                   [ngClass]="{
+                     'bg-yellow-400': item.status === 'completed',
+                     'bg-orange-300': item.status === 'in_progress',
+                     'bg-gray-200': item.status === 'pending'
+                   }"></div>
+
+              <div class="p-6 flex flex-col h-full">
+                <!-- Header: Icon & Status -->
+                <div class="flex justify-between items-start mb-4">
+                  <div class="w-12 h-12 rounded-lg flex items-center justify-center text-2xl"
+                       [ngClass]="{
+                         'bg-yellow-50 text-yellow-600': item.status === 'completed',
+                         'bg-gray-100 text-gray-400': item.status !== 'completed'
+                       }">
+                    <span class="material-icons">{{ item.badge.icon }}</span>
+                  </div>
+
+                  @if (item.status === 'completed') {
+                    <span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide">Completado</span>
+                  } @else if (item.status === 'in_progress') {
+                    <span class="bg-orange-100 text-orange-700 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide">En Curso</span>
+                  } @else {
+                    <span class="bg-gray-100 text-gray-500 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide">Pendiente</span>
+                  }
+                </div>
+
+                <!-- Unit Badge -->
+                <span class="inline-block bg-purple-50 text-purple-700 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide w-max mb-3">
+                  {{ item.badge.unit }}
+                </span>
+
+                <!-- Title -->
+                <h3 class="font-bold text-lg text-gray-800 mb-4 leading-tight min-h-[3rem]">
+                  {{ item.badge.name }}
+                </h3>
+
+                <!-- Metadata -->
+                <div class="flex items-center gap-4 text-xs text-gray-500 mb-6">
+                  <div class="flex items-center gap-1">
+                    <span class="material-icons text-sm">schedule</span>
+                    {{ item.badge.hours }} Horas
+                  </div>
+                  @if (item.issued) {
+                    <div class="flex items-center gap-1">
+                      <span class="material-icons text-sm">calendar_today</span>
+                      {{ item.issued.issueDate | date:'MMM yyyy' }}
+                    </div>
+                  }
+                </div>
+
+                <!-- Footer / Action Area -->
+                <div class="mt-auto pt-4 border-t border-gray-50">
+                  @if (item.status === 'completed') {
+                    <div class="flex justify-between items-center">
+                      <!-- Mock Avatars -->
+                      <div class="flex -space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center overflow-hidden">
+                           <span class="material-icons text-gray-400 text-sm">person</span>
+                        </div>
+                         <div class="w-8 h-8 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center overflow-hidden">
+                           <span class="material-icons text-blue-400 text-sm">person</span>
+                        </div>
+                      </div>
+                      
+                      <button (click)="downloadCertificate(item)" class="flex items-center gap-1 text-purple-700 font-bold text-xs hover:text-purple-900 transition-colors">
+                        <span class="material-icons text-sm">download</span>
+                        Certificado
+                      </button>
+                    </div>
+                  } @else if (item.status === 'in_progress') {
+                    <div class="w-full bg-gray-100 rounded-full h-1.5 mb-2">
+                      <div class="bg-purple-600 h-1.5 rounded-full" [style.width.%]="item.progress"></div>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                      <span class="text-gray-500">{{ item.progress }}% Completado</span>
+                      <button class="text-purple-700 font-bold hover:underline">Continuar</button>
+                    </div>
+                  } @else {
+                    <div class="text-center">
+                      <p class="text-xs text-gray-400 italic">Requiere completar prerrequisitos</p>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          } @empty {
+             <div class="col-span-2 text-center py-12">
+               <p class="text-gray-500">No se encontraron insignias.</p>
+             </div>
+          }
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-gray-200 mt-12 py-8">
+    <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-4">
+        <h2 class="font-bold text-xl text-[#4a148c]">FCE</h2>
+        <span class="h-6 w-px bg-gray-300"></span>
+        <span class="text-sm text-gray-500">Universidad Nacional de Colombia</span>
+      </div>
+      <div class="flex gap-4">
+         <span class="material-icons text-gray-400 cursor-pointer hover:text-gray-600">facebook</span>
+         <span class="material-icons text-gray-400 cursor-pointer hover:text-gray-600">email</span>
+      </div>
+    </div>
+    <div class="text-center mt-6 text-xs text-gray-400">
+      © 2024 Unidad de Informática y Comunicaciones FCE. Todos los derechos reservados.
+    </div>
+  </footer>
+
+  <!-- Retain Modal for functionality -->
+  @if (selectedBadgeDetail(); as detail) {
+     <!-- ... existing modal code, lightly simplified or kept same if functional ... -->
+     <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+       <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="selectedBadgeDetail.set(null)"></div>
+       <div class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden p-6">
+          <h2 class="text-2xl font-bold mb-4">{{ detail.badge.name }}</h2>
+          <p class="text-gray-600 mb-6">{{ detail.badge.description }}</p>
+          <div class="flex justify-end gap-3">
+            <button (click)="selectedBadgeDetail.set(null)" class="px-4 py-2 border rounded hover:bg-gray-50">Cerrar</button>
+            @if(detail.issued) {
+              <button (click)="downloadCertificate(detail)" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">Descargar Certificado</button>
+            }
+          </div>
+       </div>
+     </div>
+  }
+</div>

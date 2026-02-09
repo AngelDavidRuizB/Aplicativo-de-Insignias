@@ -17,7 +17,24 @@
               "browser": "."
             },
             "browser": "index.tsx",
-            "tsConfig": "tsconfig.json"
+            "tsConfig": "tsconfig.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "src/assets",
+                "output": "assets"
+              }
+            ],
+            "allowedCommonJsDependencies": [
+              "jspdf",
+              "jspdf-autotable",
+              "html2canvas",
+              "dompurify",
+              "canvg",
+              "core-js",
+              "raf",
+              "rgbcolor"
+            ]
           },
           "configurations": {
             "production": {
@@ -48,5 +65,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "55eb429a-0ef9-4595-882c-e38b6952be7b"
   }
 }

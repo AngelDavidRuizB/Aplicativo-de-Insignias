@@ -65,7 +65,7 @@ import { FormsModule } from '@angular/forms';
               Verificación de Insignias
             </h1>
             <p class="text-text-muted-light dark:text-text-muted-dark text-sm md:text-base">
-              Bienvenido al portal oficial de validación. Ingrese el código único o escanee el QR para verificar la autenticidad de una certificación.
+              Bienvenido al portal oficial de validación. Ingrese el código único para verificar la autenticidad de una certificación.
             </p>
           </div>
 
@@ -90,16 +90,7 @@ import { FormsModule } from '@angular/forms';
               </div>
             </div>
 
-            <div class="relative flex items-center py-2">
-              <div class="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
-              <span class="flex-shrink-0 mx-4 text-slate-400 text-xs uppercase tracking-wider font-semibold">O validar con</span>
-              <div class="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
-            </div>
 
-            <button class="w-full flex items-center justify-center space-x-3 py-3 px-4 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl text-text-muted-light dark:text-slate-300 hover:border-primary hover:text-primary dark:hover:border-primary dark:hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-800 transition-all group">
-              <span class="material-icons-outlined text-2xl group-hover:scale-110 transition-transform">qr_code_scanner</span>
-              <span class="font-medium">Escanear código QR con la cámara</span>
-            </button>
           </div>
 
           <div class="bg-slate-50 dark:bg-slate-900/50 px-8 py-4 border-t border-slate-100 dark:border-slate-700">
@@ -123,6 +114,33 @@ import { FormsModule } from '@angular/forms';
             </div>
           </div>
         </div>
+
+        @if (foundBadge()) {
+          <div class="w-full max-w-2xl mt-6 bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden border-l-4 border-green-500 animate-fade-in-up">
+            <div class="p-6 flex flex-col md:flex-row items-center gap-6">
+               <div class="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
+                  <span class="material-icons text-4xl text-green-600 dark:text-green-400">workspace_premium</span>
+               </div>
+               <div class="flex-grow text-center md:text-left">
+                  <div class="flex items-center justify-center md:justify-start gap-2 mb-1">
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-white">{{ foundBadge().name }}</h3>
+                    <span class="bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-300 text-xs px-2 py-0.5 rounded-full border border-green-200 dark:border-green-800 font-bold uppercase tracking-wider">Válido</span>
+                  </div>
+                  <div class="space-y-1">
+                    <p class="text-gray-600 dark:text-gray-300">Conferido a: <span class="font-bold text-gray-900 dark:text-white">{{ foundBadge().student }}</span></p>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm">Fecha de emisión: <span class="font-mono">{{ foundBadge().date }}</span></p>
+                    <p class="text-sm text-gray-500 italic mt-2 border-t border-gray-100 dark:border-gray-700 pt-2 inline-block w-full">Certifica la aprobación del curso: "{{ foundBadge().course }}"</p>
+                  </div>
+               </div>
+               <div class="shrink-0">
+                  <button class="flex items-center space-x-2 text-admin-primary hover:text-primary-dark font-medium text-sm bg-purple-50 dark:bg-purple-900/20 px-4 py-2 rounded-lg transition-colors">
+                    <span class="material-icons">download</span>
+                    <span>Descargar PDF</span>
+                  </button>
+               </div>
+            </div>
+          </div>
+        }
 
         <div class="mt-8 text-center space-y-2">
           <a routerLink="/student" class="text-primary hover:underline text-sm font-medium cursor-pointer">¿Eres estudiante? Ingresa a tu panel aquí</a>
@@ -165,10 +183,22 @@ import { FormsModule } from '@angular/forms';
 })
 export class ValidationPortalComponent {
   searchHash = signal('');
+  foundBadge = signal<any>(null);
 
   search() {
     if (this.searchHash().trim()) {
-      alert(`Buscando certificado con hash: ${this.searchHash()}`);
+      // Mock validation
+      if (this.searchHash() === '123' || this.searchHash().length > 3) {
+        this.foundBadge.set({
+          name: 'Analista de Datos Jr',
+          student: 'Juan Pérez',
+          date: '10/02/2026',
+          course: 'Introducción a Power BI y SQL'
+        });
+      } else {
+        alert('No se encontró ninguna insignia con ese código.');
+        this.foundBadge.set(null);
+      }
     }
   }
 }

@@ -77,9 +77,9 @@ import { RouterLink } from '@angular/router';
               </div>
               <div class="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700">
                 <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3">Próximos Pasos</h3>
-                <a class="block w-full bg-admin-primary hover:bg-primary-dark text-white text-center font-medium py-3 rounded-lg transition shadow-sm cursor-pointer">
+                <button (click)="viewCourses()" class="block w-full bg-admin-primary hover:bg-primary-dark text-white text-center font-medium py-3 rounded-lg transition shadow-sm cursor-pointer">
                    Ver Cursos Disponibles
-                 </a>
+                 </button>
               </div>
             </div>
           </div>
@@ -260,4 +260,8 @@ import { RouterLink } from '@angular/router';
     </div>
   `
 })
-export class StudentDashboardComponent {}
+export class StudentDashboardComponent {
+  viewCourses() {
+    alert('Redirigiendo al catálogo de cursos de la Facultad...');
+  }
+}
