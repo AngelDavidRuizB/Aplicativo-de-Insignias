@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
 import { StorageService } from '../services/storage.service';
 import { ToastService } from '../services/toast.service';
-import { IssuedBadge, Badge, Student } from '../models/badge.model';
+import { IssuedBadge, Badge } from '../models/badge.model';
+import { HeaderComponent } from '../components/header.component';
 
 interface ValidationRecord {
   nombre: string;
@@ -18,73 +19,71 @@ interface ValidationRecord {
 @Component({
   selector: 'app-admin-issue',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, HeaderComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-purple-900 transition-colors duration-300">
-      <!-- Header -->
-      <header class="bg-gradient-to-r from-purple-700 to-purple-900 text-white shadow-xl sticky top-0 z-40">
-        <div class="container mx-auto px-4 py-4">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3" routerLink="/">
-              <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center cursor-pointer hover:bg-white/30 transition-colors">
-                <span class="material-icons text-3xl">school</span>
-              </div>
-              <div>
-                <h1 class="text-xl font-bold">Panel Administrativo</h1>
-                <p class="text-sm text-purple-200">Emisión de Insignias</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-3">
-              <span class="hidden sm:inline text-sm text-purple-200">{{ currentUser()?.name }}</span>
-              <button 
-                (click)="logout()"
-                class="p-2 hover:bg-white/20 rounded-lg transition-colors">
-                <span class="material-icons">logout</span>
-              </button>
-            </div>
+    <div class="min-h-screen bg-gray-50 flex flex-col">
+      <!-- Header compartido -->
+      <app-header 
+        [userName]="currentUser()?.name || 'Administrador'"
+        [userRole]="'Administrativo'"
+        [showRoleSelector]="false"
+        (logout)="logout()">
+      </app-header>
+
+      <!-- Navigation -->
+      <nav class="bg-white border-b border-gray-200">
+        <div class="container mx-auto px-4">
+          <div class="flex gap-1 py-3">
+            <a routerLink="/admin/catalog" 
+               class="px-5 py-2 rounded-lg text-sm font-medium hover:bg-purple-50 transition-colors whitespace-nowrap flex items-center gap-2 text-[#6a1b9a] border border-[#6a1b9a]/30">
+              <span class="material-icons text-sm">workspace_premium</span>
+              Catálogo
+            </a>
+            <a routerLink="/admin/issue" 
+               class="px-5 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex items-center gap-2 bg-[#6a1b9a] text-white hover:bg-[#5a1090] shadow-sm">
+              <span class="material-icons text-sm">send</span>
+              Emitir
+            </a>
+            <a routerLink="/" 
+               class="px-5 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors whitespace-nowrap flex items-center gap-2 ml-auto text-gray-700">
+              <span class="material-icons text-sm">public</span>
+              Portal Público
+            </a>
           </div>
         </div>
-        
-        <div class="bg-purple-800/50 border-t border-purple-600/50">
-          <div class="container mx-auto px-4">
-            <div class="flex gap-1 py-2 overflow-x-auto">
-              <a routerLink="/admin/catalog" 
-                 routerLinkActive="bg-white/20"
-                 class="px-4 py-2 rounded-lg text-sm font-medium hover:bg-white/10 transition-colors whitespace-nowrap flex items-center gap-2">
-                <span class="material-icons text-sm">workspace_premium</span>
-                Catálogo
-              </a>
-              <a routerLink="/admin/issue" 
-                 routerLinkActive="bg-white/20"
-                 class="px-4 py-2 rounded-lg text-sm font-medium hover:bg-white/10 transition-colors whitespace-nowrap flex items-center gap-2">
-                <span class="material-icons text-sm">send</span>
-                Emitir
-              </a>
-              <a routerLink="/" 
-                 class="px-4 py-2 rounded-lg text-sm font-medium hover:bg-white/10 transition-colors whitespace-nowrap flex items-center gap-2 ml-auto">
-                <span class="material-icons text-sm">public</span>
-                Portal Público
-              </a>
-            </div>
-          </div>
-        </div>
-      </header>
+      </nav>
 
       <!-- Main Content -->
-      <main class="container mx-auto px-4 py-8">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <main class="flex-1 container mx-auto px-4 py-8">
+        <!-- Header Section -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <h1 class="text-2xl font-bold text-admin-primary mb-1">Emisión Masiva de Insignias</h1>
+              <p class="text-gray-500 text-sm">Cargue un archivo Excel para procesar y emitir certificados de forma masiva.</p>
+            </div>
+            <button 
+              routerLink="/admin/catalog"
+              class="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50">
+              <span class="material-icons">arrow_back</span>
+              Volver al Catálogo
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <!-- Left Column -->
           <div class="lg:col-span-2 space-y-6">
             <!-- Badge Selection -->
-            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
-              <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-                <span class="material-icons text-purple-500">workspace_premium</span>
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <span class="material-icons text-admin-primary">workspace_premium</span>
                 1. Seleccionar Insignia
               </h2>
               <select 
                 [(ngModel)]="selectedBadgeId"
-                class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 focus:ring-2 focus:ring-purple-500 outline-none">
+                class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-admin-primary outline-none text-gray-800">
                 <option value="">Seleccione una insignia...</option>
                 @for (badge of activeBadges(); track badge.id) {
                   <option [value]="badge.id">{{ badge.name }}</option>
@@ -92,15 +91,15 @@ interface ValidationRecord {
               </select>
               
               @if (selectedBadge(); as badge) {
-                <div class="mt-4 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                <div class="mt-4 p-4 bg-purple-50 rounded-lg border border-purple-100">
                   <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl flex items-center justify-center" 
+                    <div class="w-12 h-12 rounded-lg flex items-center justify-center" 
                          [class]="'bg-' + badge.colorTheme + '-100'">
                       <span class="material-icons" [class]="'text-' + badge.colorTheme + '-600'">{{ badge.icon }}</span>
                     </div>
                     <div>
-                      <p class="font-bold text-gray-800 dark:text-white">{{ badge.name }}</p>
-                      <p class="text-sm text-gray-600 dark:text-gray-400">{{ badge.hours }} horas</p>
+                      <p class="font-bold text-gray-800">{{ badge.name }}</p>
+                      <p class="text-sm text-gray-600">{{ badge.hours }} horas</p>
                     </div>
                   </div>
                 </div>
@@ -108,9 +107,9 @@ interface ValidationRecord {
             </div>
 
             <!-- File Upload -->
-            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
-              <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-                <span class="material-icons text-purple-500">upload_file</span>
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <span class="material-icons text-admin-primary">upload_file</span>
                 2. Cargar Lista de Estudiantes
               </h2>
               
@@ -119,9 +118,9 @@ interface ValidationRecord {
                 (drop)="onDrop($event)"
                 (dragover)="onDragOver($event)"
                 (dragleave)="onDragLeave($event)"
-                [class.border-purple-500]="isDragging()"
+                [class.border-admin-primary]="isDragging()"
                 [class.bg-purple-50]="isDragging()"
-                class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center hover:border-purple-400 transition-colors cursor-pointer"
+                class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-admin-primary transition-colors cursor-pointer"
                 (click)="fileInput.click()">
                 
                 <input 
@@ -135,51 +134,66 @@ interface ValidationRecord {
                   <div class="flex items-center justify-center gap-3">
                     <span class="material-icons text-4xl text-green-500">check_circle</span>
                     <div class="text-left">
-                      <p class="font-medium text-gray-800 dark:text-white">{{ file.name }}</p>
+                      <p class="font-medium text-gray-800">{{ file.name }}</p>
                       <p class="text-sm text-gray-500">{{ formatFileSize(file.size) }}</p>
                     </div>
                     <button 
                       (click)="clearFile(); $event.stopPropagation()"
-                      class="p-2 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg text-red-500">
+                      class="p-2 hover:bg-red-100 rounded-lg text-red-500">
                       <span class="material-icons">delete</span>
                     </button>
                   </div>
                 } @else {
                   <span class="material-icons text-5xl text-gray-400 mb-3">cloud_upload</span>
-                  <p class="text-gray-600 dark:text-gray-400 mb-2">Arrastre un archivo aquí o haga clic para seleccionar</p>
+                  <p class="text-gray-600 mb-2">Arrastre un archivo aquí o haga clic para seleccionar</p>
                   <p class="text-sm text-gray-400">Soporta: CSV, Excel, JSON</p>
                 }
               </div>
 
+              <!-- Plantilla -->
+              <div class="mt-4 flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <div class="p-2 bg-purple-50 rounded">
+                  <span class="material-icons text-admin-primary">info</span>
+                </div>
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-gray-800">Plantilla Requerida</p>
+                  <p class="text-xs text-gray-500">Asegúrese de usar el formato correcto para evitar errores.</p>
+                </div>
+                <button class="text-sm font-medium text-admin-primary hover:text-purple-800 flex items-center gap-1 border border-purple-200 px-3 py-1.5 rounded bg-purple-50">
+                  <span class="material-icons text-base">download</span>
+                  Descargar Plantilla
+                </button>
+              </div>
+
               <!-- Manual Entry -->
-              <div class="mt-6">
-                <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">O ingresar manualmente:</p>
+              <div class="mt-6 pt-6 border-t border-gray-100">
+                <p class="text-sm font-medium text-gray-700 mb-3">O ingresar manualmente:</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <input 
                     [(ngModel)]="manualName"
                     type="text" 
                     placeholder="Nombre completo"
-                    class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 focus:ring-2 focus:ring-purple-500 outline-none"/>
+                    class="px-4 py-2 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-admin-primary outline-none text-gray-800"/>
                   <input 
                     [(ngModel)]="manualDocument"
                     type="text" 
                     placeholder="Documento"
-                    class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 focus:ring-2 focus:ring-purple-500 outline-none"/>
+                    class="px-4 py-2 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-admin-primary outline-none text-gray-800"/>
                   <input 
                     [(ngModel)]="manualEmail"
                     type="email" 
                     placeholder="Email"
-                    class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 focus:ring-2 focus:ring-purple-500 outline-none"/>
+                    class="px-4 py-2 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-admin-primary outline-none text-gray-800"/>
                   <input 
                     [(ngModel)]="manualGrade"
                     type="number" 
                     min="0" max="5" step="0.1"
                     placeholder="Nota (0-5)"
-                    class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 focus:ring-2 focus:ring-purple-500 outline-none"/>
+                    class="px-4 py-2 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-admin-primary outline-none text-gray-800"/>
                 </div>
                 <button 
                   (click)="addManualEntry()"
-                  class="mt-3 w-full py-2 border border-purple-600 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors flex items-center justify-center gap-2">
+                  class="mt-3 w-full py-2 border border-admin-primary text-admin-primary hover:bg-purple-50 rounded-lg font-medium flex items-center justify-center gap-2">
                   <span class="material-icons">add</span>
                   Agregar a la Lista
                 </button>
@@ -187,55 +201,64 @@ interface ValidationRecord {
             </div>
 
             <!-- Validation Results -->
-            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden">
-              <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                <h2 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                  <span class="material-icons text-purple-500">fact_check</span>
-                  3. Validación de Datos
-                </h2>
-                <span class="text-sm text-gray-500">{{ validationRecords().length }} registros</span>
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+                <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                  <span class="material-icons text-gray-400">assignment</span>
+                  3. Registro de Validación
+                </h3>
+                <span 
+                  [class.bg-yellow-100]="validationRecords().length === 0"
+                  [class.text-yellow-800]="validationRecords().length === 0"
+                  [class.bg-blue-100]="validationRecords().length > 0 && !allValidated()"
+                  [class.text-blue-800]="validationRecords().length > 0 && !allValidated()"
+                  [class.bg-green-100]="allValidated()"
+                  [class.text-green-800]="allValidated()"
+                  class="text-xs font-medium px-3 py-1 rounded-full">
+                  {{ validationRecords().length === 0 ? 'Pendiente de carga' : allValidated() ? 'Validado' : 'Procesando...' }}
+                </span>
               </div>
               
               <div class="max-h-[400px] overflow-y-auto">
                 @if (validationRecords().length === 0) {
-                  <div class="p-8 text-center text-gray-500">
-                    <span class="material-icons text-4xl mb-2">playlist_add</span>
-                    <p>No hay registros para validar</p>
+                  <div class="p-12 text-center text-gray-400">
+                    <span class="material-icons text-4xl mb-2 opacity-50">playlist_add</span>
+                    <p class="text-sm">Los detalles del procesamiento aparecerán aquí una vez cargado el archivo.</p>
                   </div>
                 } @else {
-                  <table class="w-full">
-                    <thead class="bg-gray-50 dark:bg-slate-700 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">
+                  <table class="w-full text-sm text-left">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0">
                       <tr>
-                        <th class="px-4 py-3">Nombre</th>
-                        <th class="px-4 py-3">Documento</th>
-                        <th class="px-4 py-3">Nota</th>
-                        <th class="px-4 py-3">Estado</th>
-                        <th class="px-4 py-3"></th>
+                        <th class="px-6 py-3">Nombre</th>
+                        <th class="px-6 py-3">Documento</th>
+                        <th class="px-6 py-3">Nota</th>
+                        <th class="px-6 py-3">Estado</th>
+                        <th class="px-6 py-3"></th>
                       </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                    <tbody class="divide-y divide-gray-200">
                       @for (record of validationRecords(); track $index) {
-                        <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50">
-                          <td class="px-4 py-3">{{ record.nombre }}</td>
-                          <td class="px-4 py-3 font-mono text-sm">{{ record.documento }}</td>
-                          <td class="px-4 py-3">{{ record.nota }}</td>
-                          <td class="px-4 py-3">
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-3">{{ record.nombre }}</td>
+                          <td class="px-6 py-3 font-mono text-sm">{{ record.documento }}</td>
+                          <td class="px-6 py-3">{{ record.nota }}</td>
+                          <td class="px-6 py-3">
                             @if (record.valido) {
-                              <span class="inline-flex items-center gap-1 text-green-600">
+                              <span class="inline-flex items-center gap-1 text-green-600 font-semibold">
                                 <span class="material-icons text-sm">check_circle</span>
-                                Válido
+                                OK
                               </span>
                             } @else {
-                              <span class="inline-flex items-center gap-1 text-red-600" [title]="record.error">
+                              <span class="inline-flex items-center gap-1 text-red-600 font-semibold" [title]="record.error">
                                 <span class="material-icons text-sm">error</span>
-                                {{ record.error || 'Error' }}
+                                Error
                               </span>
                             }
                           </td>
-                          <td class="px-4 py-3 text-right">
+                          <td class="px-6 py-3 text-right">
                             <button 
                               (click)="removeRecord($index)"
-                              class="text-red-500 hover:text-red-700">
+                              class="text-gray-400 hover:text-red-500">
                               <span class="material-icons text-sm">delete</span>
                             </button>
                           </td>
@@ -251,54 +274,69 @@ interface ValidationRecord {
           <!-- Right Column -->
           <div class="lg:col-span-1 space-y-6">
             <!-- Summary Card -->
-            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 sticky top-40">
-              <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-6">Resumen de Emisión</h3>
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-40">
+              <h3 class="text-lg font-bold text-gray-800 mb-6 border-b border-gray-200 pb-2">Acciones</h3>
               
               <div class="space-y-4 mb-6">
-                <div class="flex justify-between items-center">
-                  <span class="text-gray-600 dark:text-gray-400">Total Registros</span>
-                  <span class="text-xl font-bold text-gray-800 dark:text-white">{{ validationRecords().length }}</span>
+                <div class="flex justify-between items-center text-sm">
+                  <span class="text-gray-600">Registros Totales:</span>
+                  <span class="font-medium text-gray-900">{{ validationRecords().length }}</span>
                 </div>
-                <div class="flex justify-between items-center">
-                  <span class="text-gray-600 dark:text-gray-400">Válidos</span>
-                  <span class="text-xl font-bold text-green-600">{{ validRecords() }}</span>
+                <div class="flex justify-between items-center text-sm">
+                  <span class="text-gray-600">Registros Válidos:</span>
+                  <span class="font-medium text-green-600">{{ validRecords() }}</span>
                 </div>
-                <div class="flex justify-between items-center">
-                  <span class="text-gray-600 dark:text-gray-400">Con Errores</span>
-                  <span class="text-xl font-bold text-red-600">{{ invalidRecords() }}</span>
+                <div class="flex justify-between items-center text-sm">
+                  <span class="text-gray-600">Con Errores:</span>
+                  <span class="font-medium text-red-600">{{ invalidRecords() }}</span>
                 </div>
               </div>
 
-              <button 
-                (click)="emitBadges()"
-                [disabled]="!canEmit()"
-                class="w-full py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
-                <span class="material-icons">send</span>
-                Emitir Insignias
-              </button>
+              <div class="pt-4 border-t border-gray-200">
+                <button 
+                  (click)="emitBadges()"
+                  [disabled]="!canEmit()"
+                  class="w-full py-3 bg-admin-primary hover:bg-purple-800 disabled:bg-gray-400 text-white rounded-lg font-semibold flex items-center justify-center gap-2">
+                  <span class="material-icons">send</span>
+                  Emitir Insignias Masivamente
+                </button>
+                @if (!canEmit()) {
+                  <p class="text-xs text-center mt-2 text-gray-400">
+                    El botón se habilitará cuando la validación sea exitosa.
+                  </p>
+                }
+              </div>
 
-              @if (!canEmit()) {
-                <p class="text-xs text-gray-500 mt-2 text-center">
-                  Seleccione una insignia y agregue al menos un registro válido
-                </p>
-              }
+              <!-- Instructions -->
+              <div class="mt-6 bg-purple-50 rounded-lg p-4 border border-purple-100">
+                <h4 class="font-bold text-admin-primary mb-3 flex items-center gap-2">
+                  <span class="material-icons">lightbulb</span>
+                  Instrucciones
+                </h4>
+                <ul class="text-sm space-y-2 text-gray-700 list-disc list-inside">
+                  <li>El archivo debe contener: <strong>Documento, Nombre, Email, Nota</strong></li>
+                  <li>La nota debe ser numérica (0.0 a 5.0)</li>
+                  <li>El sistema notificará automáticamente por correo</li>
+                  <li>Las insignias se generarán en formato Open Badges 2.0</li>
+                </ul>
+              </div>
 
               <!-- Recent Emissions -->
-              <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Emisiones Recientes</h4>
+              <div class="mt-6 pt-6 border-t border-gray-200">
+                <h4 class="font-bold text-gray-800 mb-4 text-sm uppercase tracking-wide">Cargas Recientes</h4>
                 <div class="space-y-3">
                   @for (emission of recentEmissions(); track emission.id) {
-                    <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-slate-700/50 rounded-lg">
-                      <div class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                        <span class="material-icons text-sm text-green-600">check</span>
+                    <div class="flex items-start gap-3 pb-3 border-b border-gray-100 last:border-0 last:pb-0">
+                      <div class="mt-0.5 p-1.5 bg-green-100 rounded text-green-600">
+                        <span class="material-icons text-sm">check</span>
                       </div>
-                      <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-gray-800 dark:text-white truncate">{{ emission.badgeName }}</p>
+                      <div>
+                        <p class="text-sm font-medium text-gray-800">{{ emission.badgeName }}</p>
                         <p class="text-xs text-gray-500">{{ emission.studentName }}</p>
                       </div>
                     </div>
                   } @empty {
-                    <p class="text-sm text-gray-500 text-center">No hay emisiones recientes</p>
+                    <p class="text-sm text-gray-500 text-center py-4">No hay emisiones recientes</p>
                   }
                 </div>
               </div>
@@ -306,6 +344,22 @@ interface ValidationRecord {
           </div>
         </div>
       </main>
+
+      <!-- Footer -->
+      <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="container mx-auto px-4 py-6">
+          <div class="flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
+            <div>
+              <p>© 2024 UIFCE - Facultad de Ciencias Económicas. Universidad Nacional de Colombia.</p>
+            </div>
+            <div class="flex space-x-6">
+              <a class="hover:text-admin-primary" href="#">Términos y condiciones</a>
+              <a class="hover:text-admin-primary" href="#">Política de Privacidad</a>
+              <a class="hover:text-admin-primary" href="#">Soporte</a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   `
 })
@@ -314,31 +368,26 @@ export class AdminIssueComponent {
   private toastService = inject(ToastService);
   private router = inject(Router);
 
-  // File upload
   isDragging = signal(false);
   uploadedFile = signal<File | null>(null);
 
-  // Manual entry
   manualName = signal('');
   manualDocument = signal('');
   manualEmail = signal('');
   manualGrade = signal('');
 
-  // Selection
   selectedBadgeId = signal('');
   validationRecords = signal<ValidationRecord[]>([]);
 
-  // Data
   currentUser = computed(() => this.storageService.currentUser());
   activeBadges = computed(() => this.storageService.badges().filter(b => b.status === 'Activo'));
   selectedBadge = computed(() => this.storageService.badges().find(b => b.id === this.selectedBadgeId()));
   
-  // Stats
   validRecords = computed(() => this.validationRecords().filter(r => r.valido).length);
   invalidRecords = computed(() => this.validationRecords().filter(r => !r.valido).length);
   canEmit = computed(() => this.selectedBadgeId() && this.validRecords() > 0);
+  allValidated = computed(() => this.validationRecords().length > 0 && this.validRecords() === this.validationRecords().length);
   
-  // Recent emissions (last 5)
   recentEmissions = computed(() => {
     return this.storageService.issuedBadges()
       .slice(-5)
@@ -395,7 +444,6 @@ export class AdminIssueComponent {
         } else if (extension === '.csv') {
           this.parseCSV(content);
         } else {
-          // For Excel, we'll simulate parsing
           this.simulateData();
         }
       } catch (error) {
@@ -435,7 +483,6 @@ export class AdminIssueComponent {
   }
 
   simulateData(): void {
-    // Simular datos de Excel
     const mockData = [
       { nombre: 'Ana María López', documento: '1012345678', email: 'ana@unal.edu.co', nota: '4.5' },
       { nombre: 'Carlos Rodríguez', documento: '1023456789', email: 'carlos@unal.edu.co', nota: '4.2' },
@@ -497,7 +544,6 @@ export class AdminIssueComponent {
 
     this.validationRecords.update(records => [...records, record]);
     
-    // Clear form
     this.manualName.set('');
     this.manualDocument.set('');
     this.manualEmail.set('');
@@ -544,10 +590,8 @@ export class AdminIssueComponent {
       return;
     }
 
-    // Emitir cada insignia
     let successCount = 0;
     for (const record of validRecords) {
-      // Registrar o actualizar estudiante
       let student = this.storageService.getStudentByDocument(record.documento);
       if (!student) {
         student = this.storageService.addStudent({
@@ -557,7 +601,6 @@ export class AdminIssueComponent {
         });
       }
 
-      // Emitir insignia
       this.storageService.issueBadge({
         badgeId: badge.id,
         studentId: student.id,

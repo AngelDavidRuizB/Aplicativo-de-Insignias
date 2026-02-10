@@ -3,6 +3,7 @@ import { Component, ChangeDetectionStrategy, signal, computed } from '@angular/c
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { HeaderComponent } from '../app/components/header.component';
 
 const PALETTES = [
   { id: 'tech', name: 'Tecnología', iconBg: 'bg-indigo-100 dark:bg-indigo-900', iconColor: 'text-indigo-600 dark:text-indigo-300', ring: 'ring-indigo-500' },
@@ -18,45 +19,16 @@ const PALETTES = [
 @Component({
   selector: 'app-admin-catalog',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, HeaderComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="font-display text-gray-800 dark:text-gray-100 min-h-screen flex flex-col bg-background-light dark:bg-background-dark">
-      <!-- Admin Header -->
-      <header class="bg-admin-primary text-white shadow-md">
-        <div class="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div class="flex items-center space-x-3 cursor-pointer" routerLink="/">
-            <div class="font-bold text-2xl flex items-center">
-              <span class="text-3xl font-black mr-1">FCE</span>
-              <div class="border-l border-white/40 pl-2 text-xs leading-tight">
-                Facultad de<br/>Ciencias Económicas
-              </div>
-            </div>
-          </div>
-          <div class="flex items-center">
-            <div class="text-right">
-              <h1 class="text-2xl font-bold tracking-tight">UIFCE</h1>
-              <p class="text-[0.6rem] uppercase tracking-wider text-right text-white/80">Unidad de Informática</p>
-            </div>
-          </div>
-        </div>
-        <nav class="bg-admin-secondary text-white text-sm">
-          <div class="container mx-auto px-4">
-            <div class="flex items-center justify-end overflow-x-auto py-2">
-              <div class="flex items-center space-x-4">
-                <div class="flex items-center text-xs">
-                  <span class="material-icons text-sm mr-1">person</span>
-                  <span class="font-medium mr-2">Ángel David</span>
-                  <span class="bg-purple-900/40 px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider">Administrador</span>
-                </div>
-                <button class="hover:bg-purple-800 p-1 rounded-full transition-colors" routerLink="/">
-                  <span class="material-icons text-sm">logout</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </nav>
-      </header>
+      <!-- Header compartido -->
+      <app-header 
+        [userName]="'Ángel David'"
+        [userRole]="'Administrativo'"
+        [showRoleSelector]="false">
+      </app-header>
 
       <main class="flex-grow container mx-auto px-4 py-8">
         <section class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">

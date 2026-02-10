@@ -27,7 +27,7 @@ export class StudentDashboardComponent {
   currentUser = computed(() => this.storageService.currentUser());
 
   // Define filters available in the mockup
-  filters = ['Todas', 'Unidad de Informática', 'Posgrados', 'Bienestar'];
+  filters = ['Todas', 'Unidad Informática de la Facultad de Ciencias Económicas', 'Posgrados', 'Bienestar'];
 
   // All badges with their status for the current user
   allBadgesWithStatus = computed(() => {

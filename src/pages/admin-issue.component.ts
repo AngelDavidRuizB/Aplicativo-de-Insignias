@@ -2,42 +2,21 @@
 import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { HeaderComponent } from '../app/components/header.component';
 
 @Component({
   selector: 'app-admin-issue',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, HeaderComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="bg-background-light dark:bg-background-dark font-display text-text-main-light dark:text-text-main-dark min-h-screen flex flex-col transition-colors duration-200">
-      <header class="bg-admin-primary text-white shadow-md">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center border-b border-purple-800/30">
-          <div class="flex items-center space-x-2 cursor-pointer" routerLink="/">
-            <div class="flex flex-col">
-              <span class="font-bold text-xl tracking-tight">FCE</span>
-              <span class="text-[10px] leading-tight opacity-90">Facultad de<br/>Ciencias Económicas</span>
-            </div>
-          </div>
-          <div class="flex items-center">
-            <div class="text-right">
-              <span class="block font-bold text-xl tracking-tight">UIFCE</span>
-              <span class="block text-[8px] tracking-wider uppercase opacity-80">Unidad de Informática</span>
-            </div>
-          </div>
-        </div>
-        <div class="container mx-auto px-4 py-2 text-sm flex flex-wrap items-center justify-between gap-y-2">
-          <div class="flex items-center gap-4 ml-auto">
-            <div class="flex items-center gap-2">
-              <span class="material-icons-outlined text-lg">person</span>
-              <span class="font-medium">Ángel David</span>
-              <span class="bg-purple-800 text-xs px-2 py-0.5 rounded-full text-purple-100 border border-purple-700">Administrador</span>
-            </div>
-            <button class="hover:bg-purple-700 p-1 rounded transition-colors" routerLink="/">
-              <span class="material-icons-outlined">logout</span>
-            </button>
-          </div>
-        </div>
-      </header>
+      <!-- Header compartido -->
+      <app-header 
+        [userName]="'Ángel David'"
+        [userRole]="'Administrativo'"
+        [showRoleSelector]="false">
+      </app-header>
       
       <main class="flex-grow container mx-auto px-4 py-8">
         <div class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm p-6 mb-6 border border-slate-200 dark:border-slate-700">
@@ -235,7 +214,7 @@ import { RouterLink } from '@angular/router';
           <div class="mb-4 md:mb-0 flex items-center gap-4">
             <div class="flex flex-col">
               <span class="font-bold text-gray-800 dark:text-gray-300 text-sm">UIFCE</span>
-              <span>Unidad de Informática</span>
+              <span>Unidad Informática de la Facultad de Ciencias Económicas</span>
               <span>Sede de Bogotá</span>
             </div>
           </div>

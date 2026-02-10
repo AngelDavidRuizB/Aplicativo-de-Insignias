@@ -34,7 +34,7 @@ export class PdfService {
     doc.setFontSize(14);
     doc.setFont('helvetica', 'normal');
     doc.text('Facultad de Ciencias Económicas', 148.5, 48, { align: 'center' });
-    doc.text('Unidad de Informática', 148.5, 55, { align: 'center' });
+    doc.text('Unidad Informática de la Facultad de Ciencias Económicas', 148.5, 55, { align: 'center' });
 
     // Título del certificado
     doc.setFontSize(28);

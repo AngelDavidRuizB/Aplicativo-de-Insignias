@@ -1,4 +1,4 @@
-import { Injectable, signal, effect, computed } from '@angular/core';
+import { Injectable, signal, effect } from '@angular/core';
 import { Badge, IssuedBadge, Student, PALETTES, UNITS, ICONS } from '../models/badge.model';
 
 @Injectable({
@@ -8,14 +8,12 @@ export class StorageService {
   private readonly BADGES_KEY = 'fce_badges';
   private readonly ISSUED_KEY = 'fce_issued';
   private readonly STUDENTS_KEY = 'fce_students';
-  private readonly THEME_KEY = 'fce_theme';
   private readonly CURRENT_USER_KEY = 'fce_user';
 
   // Signals públicos
   badges = signal<Badge[]>([]);
   issuedBadges = signal<IssuedBadge[]>([]);
   students = signal<Student[]>([]);
-  isDarkMode = signal<boolean>(false);
   currentUser = signal<{name: string, role: 'admin' | 'student'} | null>(null);
 
   constructor() {
@@ -58,13 +56,6 @@ export class StorageService {
         })));
       }
 
-      // Cargar tema
-      const theme = localStorage.getItem(this.THEME_KEY);
-      if (theme) {
-        this.isDarkMode.set(theme === 'dark');
-        this.applyTheme();
-      }
-
       // Cargar usuario actual
       const user = localStorage.getItem(this.CURRENT_USER_KEY);
       if (user) {
@@ -91,11 +82,6 @@ export class StorageService {
     });
 
     effect(() => {
-      localStorage.setItem(this.THEME_KEY, this.isDarkMode() ? 'dark' : 'light');
-      this.applyTheme();
-    });
-
-    effect(() => {
       const user = this.currentUser();
       if (user) {
         localStorage.setItem(this.CURRENT_USER_KEY, JSON.stringify(user));
@@ -103,18 +89,6 @@ export class StorageService {
         localStorage.removeItem(this.CURRENT_USER_KEY);
       }
     });
-  }
-
-  private applyTheme(): void {
-    if (this.isDarkMode()) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }
-
-  toggleTheme(): void {
-    this.isDarkMode.update(v => !v);
   }
 
   setUser(name: string, role: 'admin' | 'student'): void {

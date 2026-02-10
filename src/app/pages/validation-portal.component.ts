@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal, computed, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -6,7 +6,7 @@ import { RouterLink } from '@angular/router';
 import { StorageService } from '../services/storage.service';
 import { ToastService } from '../services/toast.service';
 import { PdfService } from '../services/pdf.service';
-import { IssuedBadge, Badge } from '../models/badge.model';
+import { IssuedBadge } from '../models/badge.model';
 
 @Component({
   selector: 'app-validation-portal',
@@ -14,95 +14,124 @@ import { IssuedBadge, Badge } from '../models/badge.model';
   imports: [CommonModule, FormsModule, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="min-h-screen flex flex-col bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-purple-900 transition-colors duration-300">
+    <div class="min-h-screen flex flex-col bg-gray-50">
       <!-- Header -->
-      <header class="bg-gradient-to-r from-purple-700 to-purple-900 text-white shadow-xl">
-        <div class="container mx-auto px-4 py-4">
+      <header class="bg-[#4a148c] text-white shadow-md">
+        <div class="container mx-auto px-4 py-3">
           <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                <span class="material-icons text-3xl">school</span>
-              </div>
-              <div>
-                <h1 class="text-xl font-bold">FCE - Universidad Nacional</h1>
-                <p class="text-sm text-purple-200">Sistema de Insignias Digitales</p>
+            <!-- Logo FCE -->
+            <div class="flex items-center space-x-3">
+              <div class="flex flex-col leading-tight">
+                <span class="font-bold text-2xl tracking-tighter font-serif">FCE</span>
+                <span class="text-[10px] uppercase tracking-wide opacity-90">Facultad de Ciencias Económicas</span>
               </div>
             </div>
-            <div class="flex items-center gap-4">
-              <button 
-                routerLink="/student"
-                class="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors">
-                <span class="material-icons">person</span>
-                <span class="hidden sm:inline">Soy Estudiante</span>
-              </button>
-              <button 
-                routerLink="/admin/catalog"
-                class="flex items-center gap-2 px-4 py-2 bg-white text-purple-700 rounded-lg hover:bg-purple-50 transition-colors font-medium">
-                <span class="material-icons">admin_panel_settings</span>
-                <span class="hidden sm:inline">Administración</span>
-              </button>
+            <!-- Logo UIFCE -->
+            <div class="flex items-center space-x-3 text-right">
+              <div class="flex flex-col leading-tight">
+                <span class="font-bold text-2xl tracking-tighter">UIFCE</span>
+                <span class="text-[9px] uppercase tracking-wider opacity-80 border-t border-white/30 pt-0.5 mt-0.5">Unidad Informática de la Facultad de Ciencias Económicas</span>
+              </div>
             </div>
           </div>
         </div>
       </header>
 
+      <!-- Navigation Bar -->
+      <nav class="bg-[#3a106c] text-white border-t border-white/20">
+        <div class="container mx-auto px-4">
+          <div class="flex items-center justify-end py-3 gap-4">
+            <button 
+              routerLink="/student"
+              class="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm">
+              <span class="material-icons">person</span>
+              <span>Soy Estudiante</span>
+            </button>
+            <button 
+              routerLink="/admin/catalog"
+              class="flex items-center gap-2 px-4 py-2 bg-white text-purple-700 rounded-lg hover:bg-purple-50 text-sm font-medium">
+              <span class="material-icons">admin_panel_settings</span>
+              <span>Administración</span>
+            </button>
+          </div>
+        </div>
+      </nav>
+
       <!-- Main Content -->
-      <main class="flex-1 container mx-auto px-4 py-8">
-        <div class="max-w-4xl mx-auto">
-          <!-- Logo Section -->
-          <div class="text-center mb-8">
-            <div class="relative inline-block">
-              <div class="absolute inset-0 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full blur-2xl opacity-30 animate-pulse"></div>
-              <img 
-                src="assets/logo.png" 
-                alt="Logo Unidad de Informática" 
-                class="relative w-48 h-48 object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"
-                (error)="$event.target.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiBmaWxsPSJub25lIj48Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjEwMCIgZmlsbD0idXJsKCNncmFkaWVudCkiLz48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImdyYWRpZW50IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjN2MzYWVkIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMjU2M2ViIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHN2ZyB4PSI1MCIgeT0iNTAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IndoaXRlIj48cGF0aCBkPSJNMTIgM0wxIDE5TDIzIDE5TDEyIDNaTTEyIDZMMTkuNSAxOEg0LjVMMTIgNloiLz48cGF0aCBkPSJNMTIgOEw2IDE4TDE4IDE4TDEyIDhaIi8+PC9zdmc+PC9zdmc+'"
-              />
+      <main class="flex-1 container mx-auto px-4 py-12">
+        <div class="max-w-3xl mx-auto">
+          <!-- Logo UIFCE Grande -->
+          <div class="text-center mb-10">
+            <div class="inline-flex flex-col items-center">
+              <span class="text-7xl md:text-8xl font-bold tracking-tighter text-admin-primary">UIFCE</span>
+              <span class="text-base md:text-lg uppercase tracking-[0.4em] text-gray-500 mt-3 font-medium">Unidad Informática de la Facultad de Ciencias Económicas</span>
+              <div class="w-32 h-1 bg-admin-primary mt-5"></div>
             </div>
-            <h2 class="text-4xl font-bold text-gray-800 dark:text-white mt-6 mb-3">
+          </div>
+
+          <!-- Title Section -->
+          <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-3">
               Verificación de Insignias
-            </h2>
-            <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Sistema de validación de certificaciones digitales emitidas por la 
-              <span class="text-purple-600 dark:text-purple-400 font-semibold">Facultad de Ciencias Económicas</span>
+            </h1>
+            <p class="text-gray-600">
+              Sistema de validación de certificaciones digitales emitidas por la Facultad de Ciencias Económicas
             </p>
           </div>
 
-          <!-- Search Section -->
-          <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 mb-8">
-            <!-- Manual Input -->
-            <div class="mb-8">
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <!-- Search Card -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
+            <div class="mb-6">
+              <label class="block text-sm font-semibold text-gray-700 mb-3">
                 Código de Verificación
               </label>
-              <div class="flex gap-2">
+              <div class="flex gap-3">
                 <input 
                   [(ngModel)]="searchCode"
                   (keyup.enter)="validateCode()"
                   type="text" 
                   placeholder="Ej: ABCD-1234-EFGH-5678"
-                  class="flex-1 px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all uppercase"
+                  class="flex-1 px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-800 focus:ring-2 focus:ring-admin-primary focus:border-admin-primary outline-none uppercase text-base"
                   [disabled]="isValidating()"/>
                 <button 
                   (click)="validateCode()"
                   [disabled]="isValidating() || !searchCode()"
-                  class="px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors flex items-center gap-2">
+                  class="px-8 py-3 bg-[#6a1b9a] hover:bg-[#5a1090] disabled:bg-gray-300 disabled:text-gray-500 text-white rounded-lg font-semibold flex items-center gap-2 shadow-sm transition-colors duration-200">
                   <span class="material-icons">search</span>
                   <span>{{ isValidating() ? 'Validando...' : 'Validar' }}</span>
                 </button>
               </div>
             </div>
 
-
+            <!-- Certificaciones Soportadas -->
+            <div class="border-t border-gray-100 pt-6">
+              <p class="text-xs text-center text-gray-400 mb-4 uppercase tracking-wider font-medium">Certificaciones disponibles</p>
+              <div class="flex justify-center items-center gap-8 md:gap-12">
+                <div class="flex items-center gap-2 text-gray-500">
+                  <span class="font-serif font-bold text-2xl">R</span>
+                </div>
+                <div class="flex items-center gap-2 text-gray-500">
+                  <span class="material-icons text-xl">storage</span>
+                  <span class="font-medium">PostgreSQL</span>
+                </div>
+                <div class="flex items-center gap-2 text-gray-500">
+                  <span class="material-icons text-xl">bar_chart</span>
+                  <span class="font-medium">PowerBI</span>
+                </div>
+                <div class="flex items-center gap-2 text-gray-500">
+                  <span class="material-icons text-xl">code</span>
+                  <span class="font-medium">Python</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Validation Result -->
           @if (validationResult(); as result) {
-            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden animate-fade-in">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
               <!-- Valid Badge -->
               @if (result.valid) {
-                <div class="bg-gradient-to-r from-green-500 to-emerald-600 p-6 text-white">
+                <div class="bg-green-600 p-6 text-white">
                   <div class="flex items-center gap-3">
                     <span class="material-icons text-4xl">check_circle</span>
                     <div>
@@ -116,21 +145,21 @@ import { IssuedBadge, Badge } from '../models/badge.model';
                   <div class="grid md:grid-cols-2 gap-6">
                     <!-- Badge Info -->
                     <div>
-                      <h4 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3">Información del Certificado</h4>
+                      <h4 class="text-sm font-semibold text-gray-500 uppercase mb-3">Información del Certificado</h4>
                       <div class="space-y-3">
-                        <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-slate-700 rounded-lg">
-                          <span class="material-icons text-purple-500">workspace_premium</span>
+                        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                          <span class="material-icons text-admin-primary">workspace_premium</span>
                           <div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Insignia</p>
-                            <p class="font-medium text-gray-800 dark:text-white">{{ result.data!.badgeName }}</p>
+                            <p class="text-xs text-gray-500">Insignia</p>
+                            <p class="font-medium text-gray-800">{{ result.data!.badgeName }}</p>
                           </div>
                         </div>
 
-                        <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-slate-700 rounded-lg">
-                          <span class="material-icons text-purple-500">schedule</span>
+                        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                          <span class="material-icons text-admin-primary">schedule</span>
                           <div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Fecha de Emisión</p>
-                            <p class="font-medium text-gray-800 dark:text-white">{{ formatDate(result.data!.issueDate) }}</p>
+                            <p class="text-xs text-gray-500">Fecha de Emisión</p>
+                            <p class="font-medium text-gray-800">{{ formatDate(result.data!.issueDate) }}</p>
                           </div>
                         </div>
                       </div>
@@ -138,27 +167,27 @@ import { IssuedBadge, Badge } from '../models/badge.model';
 
                     <!-- Student Info -->
                     <div>
-                      <h4 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3">Estudiante</h4>
+                      <h4 class="text-sm font-semibold text-gray-500 uppercase mb-3">Estudiante</h4>
                       <div class="space-y-3">
-                        <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-slate-700 rounded-lg">
-                          <span class="material-icons text-purple-500">person</span>
+                        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                          <span class="material-icons text-admin-primary">person</span>
                           <div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Nombre</p>
-                            <p class="font-medium text-gray-800 dark:text-white">{{ result.data!.studentName }}</p>
+                            <p class="text-xs text-gray-500">Nombre</p>
+                            <p class="font-medium text-gray-800">{{ result.data!.studentName }}</p>
                           </div>
                         </div>
-                        <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-slate-700 rounded-lg">
-                          <span class="material-icons text-purple-500">badge</span>
+                        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                          <span class="material-icons text-admin-primary">badge</span>
                           <div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Documento</p>
-                            <p class="font-medium text-gray-800 dark:text-white">{{ result.data!.studentDocument }}</p>
+                            <p class="text-xs text-gray-500">Documento</p>
+                            <p class="font-medium text-gray-800">{{ result.data!.studentDocument }}</p>
                           </div>
                         </div>
-                        <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-slate-700 rounded-lg">
-                          <span class="material-icons text-purple-500">grade</span>
+                        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                          <span class="material-icons text-admin-primary">grade</span>
                           <div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Calificación</p>
-                            <p class="font-medium text-gray-800 dark:text-white">{{ result.data!.grade }}/5.0</p>
+                            <p class="text-xs text-gray-500">Calificación</p>
+                            <p class="font-medium text-gray-800">{{ result.data!.grade }}/5.0</p>
                           </div>
                         </div>
                       </div>
@@ -166,29 +195,29 @@ import { IssuedBadge, Badge } from '../models/badge.model';
                   </div>
 
                   <!-- Actions -->
-                  <div class="flex gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                  <div class="flex gap-3 mt-6 pt-6 border-t border-gray-200">
                     <button 
                       (click)="downloadCertificate(result.data!)"
-                      class="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors">
+                      class="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-admin-primary hover:bg-purple-800 text-white rounded-lg font-semibold">
                       <span class="material-icons">download</span>
                       Descargar Certificado
                     </button>
                     <button 
                       (click)="shareResult(result.data!)"
-                      class="flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-lg transition-colors">
+                      class="flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg">
                       <span class="material-icons">share</span>
                     </button>
                   </div>
 
                   <!-- Verification Code -->
-                  <div class="mt-4 p-4 bg-gray-50 dark:bg-slate-700 rounded-lg">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Código de Verificación</p>
-                    <p class="font-mono text-lg text-gray-800 dark:text-white">{{ result.data!.hash }}</p>
+                  <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <p class="text-xs text-gray-500 mb-1">Código de Verificación</p>
+                    <p class="font-mono text-lg text-gray-800">{{ result.data!.hash }}</p>
                   </div>
                 </div>
               } @else {
                 <!-- Invalid Badge -->
-                <div class="bg-gradient-to-r from-red-500 to-red-600 p-6 text-white">
+                <div class="bg-red-600 p-6 text-white">
                   <div class="flex items-center gap-3">
                     <span class="material-icons text-4xl">error</span>
                     <div>
@@ -198,12 +227,12 @@ import { IssuedBadge, Badge } from '../models/badge.model';
                   </div>
                 </div>
                 <div class="p-6 text-center">
-                  <p class="text-gray-600 dark:text-gray-300 mb-4">
+                  <p class="text-gray-600 mb-4">
                     Verifique que el código esté correctamente escrito e intente nuevamente.
                   </p>
                   <button 
                     (click)="clearResult()"
-                    class="px-6 py-2 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                    class="px-6 py-2 border border-gray-300 hover:bg-gray-50 rounded-lg">
                     Intentar Nuevamente
                   </button>
                 </div>
@@ -211,75 +240,28 @@ import { IssuedBadge, Badge } from '../models/badge.model';
             </div>
           }
 
-          <!-- Softwares Section - Certificaciones Soportadas -->
-          <div class="mt-12 mb-8 pt-8 border-t border-gray-200 dark:border-gray-700">
-            <div class="text-center mb-6">
-              <p class="text-xs font-semibold tracking-widest text-gray-400 dark:text-gray-500 uppercase mb-4">Certificaciones Soportadas</p>
-              <div class="flex flex-wrap justify-center items-center gap-6 md:gap-8">
-                <!-- R -->
-                <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors cursor-default">
-                  <span class="font-serif font-bold text-xl">R</span>
-                </div>
-                
-                <!-- PostgreSQL -->
-                <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors cursor-default">
-                  <span class="material-icons text-lg">storage</span>
-                  <span class="text-sm font-medium">PostgreSQL</span>
-                </div>
-                
-                <!-- PowerBI -->
-                <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors cursor-default">
-                  <span class="material-icons text-lg">bar_chart</span>
-                  <span class="text-sm font-medium">PowerBI</span>
-                </div>
-                
-                <!-- Python -->
-                <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors cursor-default">
-                  <span class="material-icons text-lg">code</span>
-                  <span class="text-sm font-medium">Python</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
         </div>
       </main>
 
       <!-- Footer -->
-      <footer class="bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-gray-700 mt-auto">
+      <footer class="bg-white border-t border-gray-200 mt-auto">
         <div class="container mx-auto px-4 py-6">
           <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="text-center md:text-left">
-              <p class="font-semibold text-gray-800 dark:text-white">UIFCE - Unidad de Informática</p>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Facultad de Ciencias Económicas</p>
+            <div class="flex items-center space-x-3">
+              <span class="font-bold text-admin-primary text-lg">FCE</span>
+              <span class="h-4 w-px bg-gray-300"></span>
+              <span class="text-sm text-gray-500">Universidad Nacional de Colombia</span>
             </div>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-              © 2024 Universidad Nacional de Colombia
-            </p>
+            <div class="text-center md:text-right">
+              <p class="text-xs text-gray-400">
+                © 2026 Facultad de Ciencias Económicas - Unidad Informática de la Facultad de Ciencias Económicas
+              </p>
+            </div>
           </div>
         </div>
       </footer>
     </div>
-  `,
-  styles: [`
-    @keyframes fade-in {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .animate-fade-in {
-      animation: fade-in 0.3s ease-out;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
-    }
-
-    .animate-float {
-      animation: float 3s ease-in-out infinite;
-    }
-  `]
+  `
 })
 export class ValidationPortalComponent {
   private storageService = inject(StorageService);
@@ -290,8 +272,6 @@ export class ValidationPortalComponent {
   isValidating = signal(false);
   validationResult = signal<{valid: boolean; data?: IssuedBadge} | null>(null);
 
-
-
   async validateCode(): Promise<void> {
     const code = this.searchCode().trim().toUpperCase();
     if (!code) {
@@ -301,7 +281,6 @@ export class ValidationPortalComponent {
 
     this.isValidating.set(true);
     
-    // Simular pequeña demora de red
     await new Promise(resolve => setTimeout(resolve, 800));
 
     const issued = this.storageService.validateBadge(code);

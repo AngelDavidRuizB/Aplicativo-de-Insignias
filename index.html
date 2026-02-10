@@ -11,16 +11,11 @@
 <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: "class",
             theme: {
                 extend: {
                     colors: {
                         primary: "#6a1b9a",
                         "primary-dark": "#4a148c",
-                        "background-light": "#f1f5f9",
-                        "background-dark": "#0f172a",
-                        "surface-light": "#ffffff",
-                        "surface-dark": "#1e293b",
                     },
                     animation: {
                         'fade-in': 'fadeIn 0.3s ease-out',
@@ -45,7 +40,6 @@
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .dark ::-webkit-scrollbar-thumb { background: #475569; }
     </style>
 <script type="importmap">
 {
@@ -66,7 +60,7 @@
 }
 </script>
 </head>
-<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 min-h-screen">
+<body class="bg-gray-50 text-slate-800 min-h-screen">
     <app-root></app-root>
 </body>
 </html>

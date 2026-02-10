@@ -2,41 +2,21 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { HeaderComponent } from '../app/components/header.component';
 
 @Component({
   selector: 'app-student-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, HeaderComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-100 font-display min-h-screen flex flex-col transition-colors duration-200">
-      <header class="bg-admin-primary text-white shadow-lg sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center border-b border-purple-400/30">
-          <div class="flex items-center space-x-4 cursor-pointer" routerLink="/">
-            <div class="flex flex-col">
-              <span class="text-2xl font-bold tracking-tight">FCE</span>
-              <span class="text-xs uppercase tracking-wider opacity-90">Facultad de Ciencias Económicas</span>
-            </div>
-          </div>
-          <div>
-            <span class="text-2xl font-bold tracking-widest">UIFCE</span>
-          </div>
-        </div>
-        <nav class="container mx-auto px-4 py-2">
-          <div class="flex flex-col md:flex-row justify-end items-center gap-4">
-            <div class="flex items-center space-x-4">
-              <div class="flex items-center space-x-2 bg-black/20 px-4 py-1.5 rounded-full">
-                <span class="material-icons text-lg">person</span>
-                <span class="font-medium text-sm">Ángel David</span>
-                <span class="bg-admin-secondary text-xs px-2 py-0.5 rounded text-white font-bold uppercase tracking-wider ml-2">Estudiante</span>
-              </div>
-              <button class="hover:bg-white/10 p-2 rounded-full transition" routerLink="/">
-                <span class="material-icons transform rotate-180">logout</span>
-              </button>
-            </div>
-          </div>
-        </nav>
-      </header>
+      <!-- Header compartido -->
+      <app-header 
+        [userName]="'Ángel David'"
+        [userRole]="'Estudiante'"
+        [showRoleSelector]="false">
+      </app-header>
 
       <main class="container mx-auto px-4 py-8 flex-grow">
         <div class="mb-8">
@@ -103,7 +83,7 @@ import { RouterLink } from '@angular/router';
                     Todas
                 </button>
                 <button class="px-3 py-1.5 rounded-full text-sm font-medium bg-white dark:bg-surface-dark text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-admin-primary hover:text-admin-primary dark:hover:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all">
-                    Unidad de Informática
+                    Unidad Informática de la Facultad de Ciencias Económicas
                 </button>
                 <button class="px-3 py-1.5 rounded-full text-sm font-medium bg-white dark:bg-surface-dark text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-admin-primary hover:text-admin-primary dark:hover:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all">
                     Posgrados
@@ -125,7 +105,7 @@ import { RouterLink } from '@angular/router';
                     </div>
                     <span class="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs px-2 py-1 rounded-full font-bold uppercase">Completado</span>
                   </div>
-                  <span class="bg-admin-primary/10 text-admin-primary dark:text-purple-300 px-2 py-1 rounded text-xs font-bold uppercase tracking-wide mb-2 inline-block">Unidad de Informática</span>
+                  <span class="bg-admin-primary/10 text-admin-primary dark:text-purple-300 px-2 py-1 rounded text-xs font-bold uppercase tracking-wide mb-2 inline-block">Unidad Informática de la Facultad de Ciencias Económicas</span>
                   <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-2 group-hover:text-admin-primary transition-colors">Power BI para Análisis de Datos</h3>
                   <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
                     <span class="flex items-center">
@@ -160,7 +140,7 @@ import { RouterLink } from '@angular/router';
                     </div>
                     <span class="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs px-2 py-1 rounded-full font-bold uppercase">Completado</span>
                   </div>
-                  <span class="bg-admin-primary/10 text-admin-primary dark:text-purple-300 px-2 py-1 rounded text-xs font-bold uppercase tracking-wide mb-2 inline-block">Unidad de Informática</span>
+                  <span class="bg-admin-primary/10 text-admin-primary dark:text-purple-300 px-2 py-1 rounded text-xs font-bold uppercase tracking-wide mb-2 inline-block">Unidad Informática de la Facultad de Ciencias Económicas</span>
                   <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-2 group-hover:text-admin-primary transition-colors">Administración de Bases de Datos MySQL</h3>
                   <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4 space-x-4">
                     <span class="flex items-center">
@@ -253,7 +233,7 @@ import { RouterLink } from '@angular/router';
             </div>
           </div>
           <div class="text-center mt-6 text-xs text-gray-400 dark:text-gray-600">
-            © 2024 Unidad de Informática y Comunicaciones FCE. Todos los derechos reservados.
+            © 2024 Unidad Informática de la Facultad de Ciencias Económicas y Comunicaciones FCE. Todos los derechos reservados.
           </div>
         </footer>
       </main>
