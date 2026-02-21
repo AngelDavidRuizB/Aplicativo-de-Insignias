@@ -16,9 +16,13 @@
               "base": "./dist",
               "browser": "."
             },
+            "index": "index.html",
             "browser": "index.tsx",
             "tsConfig": "tsconfig.json",
+            "inlineStyleLanguage": "css",
             "assets": [
+              "logo.png",
+              "404.html",
               {
                 "glob": "**/*",
                 "input": "src/assets",
